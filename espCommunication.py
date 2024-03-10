@@ -3,7 +3,9 @@ import serial
 import time
 
 def send_matrix(matrix):
-
+    # Open serial connection
+    # Make sure to replace 'COM3' with the correct port for your ESP32
+    # and adjust the baudrate if different.
     ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
     time.sleep(2)  # wait for the serial connection to initialize
 
