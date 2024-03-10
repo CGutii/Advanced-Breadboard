@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Documents - Advanced Breadboard</title>
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <img src="ucfLogo.png" alt="Logo" />
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="documents.html">Documents</a></li>
+          <li><a href="demo.html">Demo</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <section class="document-section">
+      <div class="document-item">
+        <h2>Divide & Conquer</h2>
+        <div class="buttons">
+          <button onclick="viewPdf('DC.pdf')">View PDF</button>
+          <a href="DC.pdf" download><button>Download PDF</button></a>
+        </div>
+      </div>
+
+      <div class="document-item">
+        <h2>45 Page</h2>
+        <div class="buttons">
+          <button onclick="viewPdf('45page.pdf')">View PDF</button>
+          <a href="45page.pdf" download><button>Download PDF</button></a>
+        </div>
+      </div>
+
+      <div class="document-item">
+        <h2>90 Page</h2>
+        <div class="buttons">
+          <button onclick="viewPdf('90pageDraft.pdf')">View PDF</button>
+          <a href="90pageDraft.pdf" download><button>Download PDF</button></a>
+        </div>
+      </div>
+
+      <div class="document-item">
+        <h2>Final Report</h2>
+        <div class="buttons">
+          <button onclick="viewPdf('final-report.pdf')">View PDF</button>
+          <a href="final-report.pdf" download><button>Download PDF</button></a>
+        </div>
+      </div>
+
+      <div class="document-item">
+        <h2>CDR</h2>
+        <div class="buttons">
+          <button onclick="viewPdf('CDR.pdf')">View PDF</button>
+          <a href="CDR.pdf" download><button>Download PDF</button></a>
+        </div>
+      </div>
+    </section>
+
+    <section id="pdf-viewer" class="overlay">
+      <iframe width="90%" height="90%" id="pdfFrame"></iframe>
+      <div class="adjust-size">
+        <button onclick="closePdf()">Close PDF</button>
+      </div>
+    </section>
+
+    <section id="coming-soon" class="overlay">
+      <div class="centered">
+        <h2>Coming Soon</h2>
+        <p>Stay tuned for updates on implementation!</p>
+        <button onclick="closeOverlay()">Close</button>
+      </div>
+    </section>
+
+    <script src="scripts.js"></script>
+  </body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      h1 {
+        text-align: center;
+      }
+      .hero h1 {
+        font-size: larger; /* Makes "Advanced Breadboard" title slightly larger */
+      }
+      .hero img {
+        width: 50%; /* Sets the image to half of its original size */
+      }
+      .hero h2,
+      .hero h3,
+      .hero p {
+        color: white; /* Sets the text color of titles and paragraphs to white */
+      }
+      .hero a {
+        color: white; /* Sets hyperlink text color to white */
+      }
+      .hero a:hover {
+        color: goldenrod; /* Changes hyperlink color to golden yellow on hover */
+      }
+    </style>
+    <title>Advanced Breadboard</title>
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <img src="ucfLogo.png" alt="Logo" id="logoImage" />
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="documents.html">Documents</a></li>
+          <li><a href="demo.html">Demo</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <h1>Advanced Breadboard</h1>
+
+    <!-- Project Description Section -->
+    <section class="hero">
+      <h3>Project Overview</h3>
+      <p>
+        The Advanced Breadboard project aims to redesign the traditional
+        breadboard with enhanced features that assist users in avoiding common
+        circuit-building mistakes by incorporating technology such as ESP32
+        Microcontroller, Raspberry Pi 4B, and I2C Digital Wattmeter Sensor,
+        facilitating easier learning and debugging for both lab and home use.
+      </p>
+    </section>
+
+    <section class="hero">
+      <h3>Goal</h3>
+      <p>
+        Redesigned breadboard with advanced features to assist students in
+        learning how to use the breadboard
+      </p>
+    </section>
+
+    <section class="hero">
+      <h3>Objectives</h3>
+      <li>Schematic to breadboard wiring algorithm</li>
+      <li>LED activation for component placement</li>
+      <li>Open/short circuit detection</li>
+    </section>
+
+    <!-- Committee Members Section -->
+    <section class="hero">
+      <h2>Committee Members</h2>
+      <p>
+        <a href="https://www.ece.ucf.edu/person/mike-borowczak/"
+          >Dr. Mike Borowzcack</a
+        >
+      </p>
+      <p>
+        <a href="https://www.ece.ucf.edu/person/sonali-das/">Dr. Sonali Das</a>
+      </p>
+      <p>
+        <a href="https://www.cecs.ucf.edu/faculty/suboh-suboh/"
+          >Dr. Suboh Suboh</a
+        >
+      </p>
+    </section>
+
+    <section id="coming-soon" class="overlay">
+      <div class="centered">
+        <h2>Coming Soon</h2>
+        <p>Stay tuned for updates on implementation!</p>
+      </div>
+    </section>
+
+    <script src="scripts.js"></script>
+  </body>
+</html>

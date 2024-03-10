@@ -1,0 +1,209 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to right, #000000, goldenrod);
+  color: #fff;
+  animation: moveBg 10s linear infinite;
+  background-size: 300% 300%;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 5%;
+}
+
+.logo img {
+  max-width: 100px;
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  gap: 20px;
+}
+
+nav a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.hero {
+  padding: 50px 5%;
+  text-align: center;
+}
+
+.buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #000000;
+  color: #fff;
+  cursor: pointer;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.centered {
+  text-align: center;
+}
+
+@media only screen and (max-width: 768px) {
+  header {
+    flex-direction: row;
+  }
+
+  nav ul {
+    flex-direction: row;
+    text-align: center;
+    gap: 10px;
+  }
+}
+
+body {
+  animation: moveBg 10s linear infinite;
+  background-size: 300% 300%;
+}
+
+@keyframes moveBg {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.team {
+  display: flex;
+  justify-content: space-around;
+  padding: 20px 5%;
+}
+
+.team {
+  flex-direction: row;
+}
+
+.member {
+  flex-basis: 30%;
+  text-align: center;
+  margin-bottom: 40px; /* Ensure spacing between members */
+  display: flex; /* Added */
+  flex-direction: column; /* Added */
+  align-items: center; /* Added */
+}
+
+.member img {
+  width: 200px; /* Set to desired width */
+  height: 300px; /* Set to desired height, adjust as per your requirement */
+  object-fit: cover; /* Ensures the image covers the area, cropping if necessary */
+  margin: 20px 0;
+  border: 2px solid #fff; /* Adds a border as previously included */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Optional shadow for depth */
+}
+}
+
+.member {
+  margin-bottom: 40px;
+}
+
+.pdf-viewer {
+  margin: 50px 0;
+  text-align: center;
+}
+
+@media only screen and (max-width: 768px) {
+  .team {
+    flex-direction: row;
+  }
+
+  .member {
+    margin-bottom: 40px;
+  }
+}
+
+.adjust-size {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.adjust-size button {
+  padding: 5px 10px;
+  background-color: #6600cc;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+.project-images {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 50px;
+}
+
+.project-images img {
+  width: 20%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  transition: transform 0.2s;
+}
+
+.project-images img:hover {
+  transform: scale(1.1);
+}
+
+.document-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 40px;
+}
+
+.document-item {
+  flex: 1;
+  margin: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.document-item h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+@keyframes moveBg {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
