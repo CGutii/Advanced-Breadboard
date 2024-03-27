@@ -1,6 +1,7 @@
 # translate_screen.py
 import tkinter as tk
 import random
+from espCommunication import request_multimeter_data
 
 
 class TranslateScreen:
@@ -16,6 +17,7 @@ class TranslateScreen:
         # Add this after the `self.display_connections()` call in the `__init__` method
         self.dmm_button = tk.Button(self.master, text="Digital Multimeter", command=self.request_digital_multimeter)
         self.dmm_button.pack()
+        self.update_multimeter_data_periodically()
 
         
     def draw_grid(self):
@@ -70,9 +72,6 @@ class TranslateScreen:
         return matrix
     
     def request_digital_multimeter(self):
-        # This function will be called when the "Digital Multimeter" button is clicked
-        # It will request the multimeter data from the ESP module
-        from espCommunication import request_multimeter_data
         data = request_multimeter_data()
         print("Multimeter data received:", data)
         # Display the data on the screen or update a label with the received data
@@ -86,9 +85,12 @@ class TranslateScreen:
             self.multimeter_label.pack()
         else:
             self.multimeter_label.config(text=multimeter_readings)
-
-
-
+    
+    def update_multimeter_data_periodically(self):
+        data = request_multimeter_data()
+        self.update_multimeter_label(data)
+        # Schedule the next call in 3000ms (3 seconds)
+        self.master.after(3000, self.update_multimeter_data_periodically)
 
 if __name__ == "__main__":
     root = tk.Tk()
