@@ -1,3 +1,4 @@
+# translate_screen.py
 import tkinter as tk
 import random
 
