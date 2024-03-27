@@ -14,12 +14,3 @@ def send_matrix(matrix):
 
     ser.close()
     print("Matrix sent to ESP successfully.")
-
-def request_multimeter_data():
-    ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=10)
-    data = ser.readline().decode().strip()  # Read one line from ESP
-    ser.close()
-    return data.split(",")  # Assuming data is sent in 'voltage,current,power' format
-
-
-
