@@ -79,11 +79,14 @@ class TranslateScreen:
         self.update_multimeter_label(data)
 
     def update_multimeter_label(self, data):
+        # Join the received data list into a single string to display
+        multimeter_readings = "\n".join(data)
         if not hasattr(self, 'multimeter_label'):
-            self.multimeter_label = tk.Label(self.master, text=data)
+            self.multimeter_label = tk.Label(self.master, text=multimeter_readings)
             self.multimeter_label.pack()
         else:
-            self.multimeter_label.config(text=data)
+            self.multimeter_label.config(text=multimeter_readings)
+
 
 
 
