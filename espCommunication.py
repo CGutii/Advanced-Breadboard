@@ -1,26 +1,29 @@
-# espCommunication.py
 import serial
 import time
 
 def send_matrix(matrix):
-    # Open serial connection
-    # Make sure to replace 'COM3' with the correct port for your ESP32
-    # and adjust the baudrate if different.
-    ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
-    time.sleep(2)  # wait for the serial connection to initialize
+    print("Sending matrix to ESP:", matrix)
+    try:
+        ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+        time.sleep(2)  # Allow time for the serial connection to establish
 
-    for row in matrix:
-        # Convert the row list to a string and send it
-        line = ' '.join(row) + '\n'
-        ser.write(line.encode())
+        matrix_str = ';'.join([' '.join(row) for row in matrix]) + '\n'
+        ser.write(matrix_str.encode())
+        print(f"Matrix sent: {matrix_str.strip()}")
 
-    ser.close()  # Close the serial connection
+        # Wait for acknowledgment with a 10-second timeout
+        start_time = time.time()
+        while True:
+            if ser.in_waiting:
+                response = ser.readline().decode().strip()
+                print(f"Response from ESP: {response}")
+                if response == "Received on the ESP":
+                    print("ESP acknowledged receipt.")
+                    break
+            if time.time() - start_time > 10:  # Timeout after 10 seconds
+                print("Timeout waiting for response from ESP.")
+                break
 
-if __name__ == "__main__":
-    # Test matrix
-    matrix = [
-        ["R1", "0", "0"],
-        ["0", "C1", "0"],
-        ["0", "0", "R2"]
-    ]
-    send_matrix(matrix)
+        ser.close()
+    except serial.SerialException as e:
+        print(f"Serial communication error: {e}")
