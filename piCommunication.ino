@@ -1,4 +1,8 @@
 #include <Arduino.h>
+#include "DFRobot_INA219.h"
+#include <Wire.h>
+
+DFRobot_INA219_IIC ina219(&Wire, INA219_I2C_ADDRESS4);
 
 const int MATRIX_SIZE = 3;
 // Define the LED pins based on the matrix position
@@ -70,18 +74,17 @@ void loop() {
 }
 
 void sendMultimeterData() {
-  // Make sure you have included and configured the library for the digital multimeter
-  float voltage = ina219.getBusVoltage_V();
-  float current_mA = ina219.getCurrent_mA();
-  float power_mW = ina219.getPower_mW();
+    float voltage = ina219.getBusVoltage_V();
+    float current_mA = ina219.getCurrent_mA();
+    float power_mW = ina219.getPower_mW();
 
-  Serial.print("Voltage: ");
-  Serial.print(voltage);
-  Serial.print("V, Current: ");
-  Serial.print(current_mA);
-  Serial.print("mA, Power: ");
-  Serial.print(power_mW);
-  Serial.println("mW");
+    Serial.print("Voltage(V): ");
+    Serial.println(voltage, 2);  // Print voltage with 2 decimal places
+    Serial.print("Current(mA): ");
+    Serial.println(current_mA, 1);  // Print current with 1 decimal place
+    Serial.print("Power(mW): ");
+    Serial.println(power_mW, 1);  // Print power with 1 decimal place
 }
+
 
 
