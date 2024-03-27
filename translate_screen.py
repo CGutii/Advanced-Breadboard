@@ -1,3 +1,7 @@
+# translate_screen.py
+import tkinter as tk
+import random
+
 class TranslateScreen:
     def __init__(self, master, num_nodes=0, connections=[]):
         self.master = master
