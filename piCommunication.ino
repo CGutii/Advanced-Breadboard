@@ -1,44 +1,73 @@
 #include <Arduino.h>
 
-// Assuming redLed is connected to GPIO 4 as an example. Adjust according to your setup.
-#define redLed 4 
+#define redLed 4
 
 String command;
 bool matrixReceived = false;
-const int MATRIX_SIZE = 3; // Assuming a 3x3 matrix
-String matrix[MATRIX_SIZE];
+const int MATRIX_SIZE = 3;
+String matrix[MATRIX_SIZE][MATRIX_SIZE];
 int currentRow = 0;
 
-void setup() {
-  Serial.begin(9600); // Initialize serial communication at 9600 baud rate
-  pinMode(redLed, OUTPUT); // Set redLed as an OUTPUT
+void setup()
+{
+  Serial.begin(9600);
+  pinMode(redLed, OUTPUT);
 }
 
-void loop() {
-  if (Serial.available() > 0) {
-    command = Serial.readStringUntil('\n'); // Read the incoming data until newline
-    command.trim(); // Trim any whitespace
+void loop()
+{
+  if (Serial.available() > 0)
+  {
+    command = Serial.readStringUntil('\n');
+    command.trim();
 
-    if (!matrixReceived) {
-      // Store each line of the matrix until it's fully received
-      if (currentRow < MATRIX_SIZE) {
-        matrix[currentRow] = command;
-        currentRow++;
+    if (!matrixReceived && currentRow < MATRIX_SIZE)
+    {
+      int rowIndex = 0;
+      int colIndex = 0;
+      int startIndex = 0;
+      int endIndex = command.indexOf(';');
+
+      while (endIndex != -1)
+      {
+        String row = command.substring(startIndex, endIndex);
+        colIndex = 0;
+        int spaceIndex = row.indexOf(' ');
+        while (spaceIndex != -1)
+        {
+          matrix[rowIndex][colIndex++] = row.substring(0, spaceIndex);
+          row = row.substring(spaceIndex + 1);
+          spaceIndex = row.indexOf(' ');
+        }
+        matrix[rowIndex][colIndex] = row; // Last element in the row
+        rowIndex++;
+
+        startIndex = endIndex + 1;
+        endIndex = command.indexOf(';', startIndex);
       }
-      if (currentRow == MATRIX_SIZE) {
-        matrixReceived = true;
-      }
+
+      matrixReceived = true;
     }
 
-    // If the matrix is fully received, print it out and send a confirmation message
-    if (matrixReceived) {
+    if (matrixReceived)
+    {
       Serial.println("Matrix Received:");
-      for (int i = 0; i < MATRIX_SIZE; i++) {
-        Serial.println(matrix[i]);
+      for (int i = 0; i < MATRIX_SIZE; i++)
+      {
+        for (int j = 0; j < MATRIX_SIZE; j++)
+        {
+          Serial.print(matrix[i][j]);
+          Serial.print(" ");
+        }
+        Serial.println();
       }
-      Serial.println("We got your matrix!"); // Send confirmation message
-      matrixReceived = false; // Reset for the next matrix
-      currentRow = 0; // Reset row counter
+      Serial.println("Received on the ESP");
+      digitalWrite(redLed, HIGH);
+      delay(500);
+      digitalWrite(redLed, LOW);
+
+      matrixReceived = false;
+      currentRow = 0;
     }
   }
 }
