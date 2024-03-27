@@ -1,5 +1,11 @@
 #include <Arduino.h>
 
+// Global variables to store sensor data
+float busVoltage = 0;
+float shuntVoltage = 0;
+float current_mA = 0;
+float power_mW = 0;
+
 const int MATRIX_SIZE = 3;
 // Define the LED pins based on the matrix position
 const int ledPins[MATRIX_SIZE][MATRIX_SIZE] = {
@@ -57,6 +63,22 @@ void loop() {
       Serial.println("Entire matrix received on ESP.");
       // Reset for the next matrix
       currentRow = 0;
+    }
+
+      if (matrixReceived) {
+      // Read sensor data
+      busVoltage = ina219.getBusVoltage_V();
+      shuntVoltage = ina219.getShuntVoltage_mV();
+      current_mA = ina219.getCurrent_mA();
+      power_mW = ina219.getPower_mW();
+    
+      // Send sensor data to Pi
+      Serial.print(busVoltage); Serial.print(",");
+      Serial.print(shuntVoltage); Serial.print(",");
+      Serial.print(current_mA); Serial.print(",");
+      Serial.println(power_mW);
+
+      matrixReceived = false; // Reset flag for next matrix
     }
   }
 }
