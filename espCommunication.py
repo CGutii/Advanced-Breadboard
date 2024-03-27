@@ -16,10 +16,16 @@ def send_matrix(matrix):
     print("Matrix sent to ESP successfully.")
 
 def request_multimeter_data():
-    ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+    ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=10)
     time.sleep(2)
     ser.write(b'request_data\n')  # Send a newline terminated request to the ESP
-    data = ser.readline().decode().strip()  # Read the response from ESP
+    response_lines = []
+    for _ in range(4):  # Expecting 4 lines of response
+        data = ser.readline().decode().strip()  # Read lines from ESP
+        if data:  # If data is not an empty string
+            response_lines.append(data)
+            print(data)  # Debug print each line
     ser.close()
-    return data
+    return response_lines
+
 
