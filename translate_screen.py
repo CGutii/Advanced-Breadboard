@@ -2,6 +2,7 @@
 import tkinter as tk
 import random
 
+
 class TranslateScreen:
     def __init__(self, master, num_nodes=0, connections=[]):
         self.master = master
@@ -12,6 +13,10 @@ class TranslateScreen:
         self.dot_colors = ['red', 'yellow', 'green']  # Colors for each column
         self.draw_grid()
         self.display_connections()
+        # Add this after the `self.display_connections()` call in the `__init__` method
+        self.dmm_button = tk.Button(self.master, text="Digital Multimeter", command=self.request_digital_multimeter)
+        self.dmm_button.pack()
+
         
     def draw_grid(self):
         self.dot_radius = 10
@@ -63,6 +68,23 @@ class TranslateScreen:
             i, j = divmod(dot_index, 3)
             matrix[j][i] = "1"
         return matrix
+    
+    def request_digital_multimeter(self):
+        # This function will be called when the "Digital Multimeter" button is clicked
+        # It will request the multimeter data from the ESP module
+        from espCommunication import request_multimeter_data
+        data = request_multimeter_data()
+        print("Multimeter data received:", data)
+        # Display the data on the screen or update a label with the received data
+        self.update_multimeter_label(data)
+
+    def update_multimeter_label(self, data):
+        if not hasattr(self, 'multimeter_label'):
+            self.multimeter_label = tk.Label(self.master, text=data)
+            self.multimeter_label.pack()
+        else:
+            self.multimeter_label.config(text=data)
+
 
 
 if __name__ == "__main__":
