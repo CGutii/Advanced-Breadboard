@@ -25,7 +25,6 @@ void setup() {
 }
 
 void loop() {
-
   if (Serial.available() > 0) {
     String command = Serial.readStringUntil('\n');
     command.trim();
@@ -59,19 +58,5 @@ void loop() {
       // Reset for the next matrix
       currentRow = 0;
     }
-
-        // Inside loop() or another suitable function
-    if (received_command == "GET_SENSOR_DATA") {
-      float voltage = ina219.getBusVoltage_V();
-      float current = ina219.getCurrent_mA();
-      float power = ina219.getPower_mW();
-      Serial.print("SENSOR_DATA ");
-      Serial.print(voltage);
-      Serial.print(" ");
-      Serial.print(current);
-      Serial.print(" ");
-      Serial.println(power);
-}
-
   }
 }
