@@ -29,8 +29,8 @@ void setup(void) {
         delay(2000);
     }
 
-    // Linear calibration
-    ina219.linearCalibrate(/The measured current before calibration/ ina219Reading_mA, /The current measured by other current testers/ extMeterReading_mA);
+    // Linear calibration b4 and after calibration 
+    ina219.linearCalibrate(ina219Reading_mA,extMeterReading_mA);
     Serial.println();
 }
 
