@@ -1,0 +1,14 @@
+Exception in thread Thread-1 (send_matrix):
+Traceback (most recent call last):
+  File "/usr/lib/python3.11/threading.py", line 1038, in _bootstrap_inner
+    self.run()
+  File "/usr/lib/python3.11/threading.py", line 975, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/guti/Downloads/Advanced-Breadboard-main/espCommunication.py", line 42, in send_matrix
+    esp_comm.send_matrix(matrix)
+  File "/home/guti/Downloads/Advanced-Breadboard-main/espCommunication.py", line 16, in send_matrix
+    confirmation = self.ser.readline().decode('utf-8').strip()
+                   ^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/serial/serialposix.py", line 595, in read
+    raise SerialException(
+serial.serialutil.SerialException: device reports readiness to read but returned no data (device disconnected or multiple access on port?)
