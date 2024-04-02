@@ -1,7 +1,7 @@
 # translate_screen.py
 import tkinter as tk
 import random
-from espCommunication import SensorDataHandler
+from espCommunication import get_sensor_data
 
 class TranslateScreen:
     def __init__(self, master, num_nodes=0, connections=[]):
@@ -12,8 +12,9 @@ class TranslateScreen:
         self.canvas.pack()
         self.dot_colors = ['red', 'yellow', 'green']  # Colors for each column
         self.draw_grid()
-        self.sensor_data_handler = SensorDataHandler()
+        #self.sensor_data_handler = SensorDataHandler()
         self.display_connections()
+        self.sensor_data_display()
         
     def draw_grid(self):
         self.dot_radius = 10
@@ -67,13 +68,19 @@ class TranslateScreen:
         return matrix
     
     def display_sensor_data(self):
-        # Fetch sensor data
-        sensor_data = self.sensor_data_handler.get_sensor_data()
-        voltage = sensor_data["Voltage"]
-        current = sensor_data["Current"]
-        # Display sensor data on the canvas
-        self.canvas.create_text(450, 300, text=f"Voltage: {voltage}V", fill="black")
-        self.canvas.create_text(450, 330, text=f"Current: {current}mA", fill="black")
+        # Clear previous sensor data display
+        self.canvas.delete("sensor_data")
+        # Fetch and display new sensor data
+        sensor_data = get_sensor_data()
+        voltage_text = f"Voltage: {sensor_data['Voltage']}V"
+        current_text = f"Current: {sensor_data['Current']}mA"
+        self.canvas.create_text(450, 350, text=voltage_text, fill="black", tags="sensor_data")
+        self.canvas.create_text(450, 375, text=current_text, fill="black", tags="sensor_data")
+        # Schedule the next update
+        self.master.after(1000, self.display_sensor_data)
+
+    def sensor_data_display(self):
+        self.display_sensor_data()  # Initial call to display sensor data
 
 
 if __name__ == "__main__":
