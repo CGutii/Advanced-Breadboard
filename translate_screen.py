@@ -1,6 +1,7 @@
 # translate_screen.py
 import tkinter as tk
 import random
+from espCommunication import SensorDataHandler
 
 class TranslateScreen:
     def __init__(self, master, num_nodes=0, connections=[]):
@@ -11,6 +12,7 @@ class TranslateScreen:
         self.canvas.pack()
         self.dot_colors = ['red', 'yellow', 'green']  # Colors for each column
         self.draw_grid()
+        self.sensor_data_handler = SensorDataHandler()
         self.display_connections()
         
     def draw_grid(self):
@@ -63,6 +65,15 @@ class TranslateScreen:
             i, j = divmod(dot_index, 3)
             matrix[j][i] = "1"
         return matrix
+    
+    def display_sensor_data(self):
+        # Fetch sensor data
+        sensor_data = self.sensor_data_handler.get_sensor_data()
+        voltage = sensor_data["Voltage"]
+        current = sensor_data["Current"]
+        # Display sensor data on the canvas
+        self.canvas.create_text(450, 300, text=f"Voltage: {voltage}V", fill="black")
+        self.canvas.create_text(450, 330, text=f"Current: {current}mA", fill="black")
 
 
 if __name__ == "__main__":
