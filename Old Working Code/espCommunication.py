@@ -3,7 +3,7 @@ import time
 
 def send_matrix(matrix):
     print("Sending matrix to ESP:", matrix)
-    ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+    ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
     time.sleep(2)  # Wait for the serial connection to initialize
 
     # Send each row followed by a newline character
