@@ -87,11 +87,11 @@ void loop() {
     }
 
     //this should print out the sensor info
-    //printSensorData()
+    //printSensorData();
   }
 
   //if it didn't print out, comment out the other function call and uncomment this one
-  //printSensorData()
+  //printSensorData();
 }
 
 // void printSensorData() {
