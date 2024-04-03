@@ -1,4 +1,8 @@
 #include <Arduino.h>
+#include <Wire.h>
+
+#define I2C_SDA 14
+#define I2C_SCL 13
 
 const int MATRIX_SIZE = 3;
 // Define the LED pins based on the matrix position
@@ -8,12 +12,20 @@ const int ledPins[MATRIX_SIZE][MATRIX_SIZE] = {
   {26, 25, 32}
 };
 
+//remember to adjust this value according to what board we are using
+DFRobot_INA219_IIC ina219(&Wire, INA219_I2C_ADDRESS1);
+
+// Revise the following two parameters according to actual reading of the INA219 and the multimeter
+// for linear calibration
+float ina219Reading_mA = 10000;
+float extMeterReading_mA = 1000;
+
 String matrix[MATRIX_SIZE][MATRIX_SIZE]; // Matrix to store the received values
 int currentRow = 0; // Current row being processed
 bool matrixReceived = false; // Flag to indicate if matrix is fully received
 
 void setup() {
-  Serial.begin(9600); // Begin serial communication at 9600 baud rate
+  Serial.begin(115200); // Begin serial communication at 9600 baud rate
   
   // Initialize the LED pins
   for (int i = 0; i < MATRIX_SIZE; i++) {
@@ -22,6 +34,20 @@ void setup() {
       digitalWrite(ledPins[i][j], LOW); // Turn off all LEDs initially
     }
   }
+
+  while (!Serial);
+
+    Wire.begin(I2C_SDA, I2C_SCL); // Initialize I2C communication
+
+    while (!ina219.begin()) {
+        Serial.println("INA219 begin failed");
+        delay(2000);
+    }
+
+    // Linear calibration b4 and after calibration 
+    ina219.linearCalibrate(ina219Reading_mA,extMeterReading_mA);
+    Serial.println();
+  
 }
 
 void loop() {
@@ -58,5 +84,21 @@ void loop() {
       // Reset for the next matrix
       currentRow = 0;
     }
+
+    //this should print out the sensor info
+    //printSensorData()
   }
+
+  //if it didn't print out, comment out the other function call and uncomment this one
+  //printSensorData()
 }
+
+// void printSensorData() {
+//     Serial.print("BusVoltage:   ");
+//     Serial.print(ina219.getBusVoltage_V(), 2);
+//     Serial.println("V");
+
+//     Serial.print("Current:      ");
+//     Serial.print(ina219.getCurrent_mA(), 1);
+//     Serial.println("mA");
+// }
