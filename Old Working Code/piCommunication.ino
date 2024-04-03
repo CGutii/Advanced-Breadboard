@@ -13,10 +13,10 @@ int currentRow = 0; // Current row being processed
 bool matrixReceived = false; // Flag to indicate if matrix is fully received
 
 void setup() {
-  Serial.begin(115200); // Begin serial communication at 9600 baud rate
+  Serial.begin(9600); // Begin serial communication at 9600 baud rate
   
   // Initialize the LED pins
-  for (int i = 0; i < MATRIX_SIZE; i++) { 
+  for (int i = 0; i < MATRIX_SIZE; i++) {
     for (int j = 0; j < MATRIX_SIZE; j++) {
       pinMode(ledPins[i][j], OUTPUT);
       digitalWrite(ledPins[i][j], LOW); // Turn off all LEDs initially
