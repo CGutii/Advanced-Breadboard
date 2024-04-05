@@ -8,9 +8,9 @@
 const int MATRIX_SIZE = 3;
 // Define the LED pins based on the matrix position
 const int ledPins[MATRIX_SIZE][MATRIX_SIZE] = {
-  {2, 27, 12},
-  {17, 16, 4},
-  {26, 25, 32}
+  {2, 25, 27},
+  {12, 17, 32},
+  {26, 16, 4}
 };
 
 //remember to adjust this value according to what board we are using
