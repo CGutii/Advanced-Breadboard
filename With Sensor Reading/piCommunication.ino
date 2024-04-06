@@ -90,16 +90,16 @@ void loop() {
     //printSensorData();
   }
 
-  //if it didn't print out, comment out the other function call and uncomment this one
-  //printSensorData();
+  if (matrixReceived) {
+    Serial.println("MATRIX_RECEIVED");  // Confirm matrix reception
+    printSensorData();  // Continuously send sensor data after matrix processing
+  }
 }
 
-// void printSensorData() {
-//     Serial.print("BusVoltage:   ");
-//     Serial.print(ina219.getBusVoltage_V(), 2);
-//     Serial.println("V");
-
-//     Serial.print("Current:      ");
-//     Serial.print(ina219.getCurrent_mA(), 1);
-//     Serial.println("mA");
-// }
+void printSensorData() {
+    Serial.print("SENSOR_DATA,");
+    Serial.print(ina219.getBusVoltage_V(), 2);
+    Serial.print(",");
+    Serial.println(ina219.getCurrent_mA(), 1);
+    delay(1000); // Adjust delay as needed for continuous data sending
+}
