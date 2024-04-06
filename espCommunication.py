@@ -4,30 +4,31 @@ import time
 class ESPCommunication:
     def __init__(self):
         self.ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
-        self.sensor_data = []
+        time.sleep(2)  # Ensure serial connection initializes
 
-    def send_matrix_and_wait_for_data(self, matrix):
-        self.send_matrix(matrix)
-        self.wait_for_confirmation_and_read_sensor_data()
-
-    def send_matrix(self, matrix):
-        print("Sending matrix to ESP:")
+    def send_matrix_and_receive_data(self, matrix):
+        print("Sending matrix to ESP:", matrix)
+        # Send each row followed by a newline to signal the end of the matrix
         for row in matrix:
-            line = ' '.join(row) + '\n'
+            line = ' '.join(row) + ';'
             self.ser.write(line.encode())
-            print(f"Sent row: {line.strip()}")
-        print("Matrix sent successfully.")
-
-    def wait_for_confirmation_and_read_sensor_data(self):
+            print(f"Sent row to ESP: {line.strip()}")  # Debug print
+        
+        # Waiting for matrix processing confirmation
         while True:
-            line = self.ser.readline().decode().strip()
-            if line == "MATRIX_RECEIVED":
-                print("Matrix processing confirmed, starting to read sensor data.")
+            response = self.ser.readline().decode().strip()
+            if response == "MATRIX_RECEIVED":
+                print("ESP acknowledged matrix reception.")
                 break
-        while True:
-            sensor_data = self.ser.readline().decode().strip()
-            if sensor_data.startswith("SENSOR_DATA"):
-                print(f"Received sensor data: {sensor_data}")
-                self.sensor_data.append(sensor_data)  # Store or process as needed
+        
+        # Now, receiving sensor data
+        print("Receiving sensor data from ESP...")
+        sensor_data = self.ser.readline().decode().strip()  # Example: "SENSOR_DATA,3.3V,500mA"
+        print("Received sensor data:", sensor_data)
+        # Processing sensor data as needed
+        
+        # Close serial after operation (optional, depends on use case)
+        # self.ser.close()
 
+# Create a global instance to use across modules
 esp_comm = ESPCommunication()
