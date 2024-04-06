@@ -1,51 +1,45 @@
 import serial
 import time
-import threading
 
-class ESPCommunication:
-    def __init__(self, port='/dev/ttyUSB0', baudrate=115200):
-        self.port = port
-        self.baudrate = baudrate
-        self.ser = None
+flag = True
+sensor_info = ""
 
-    def open_connection(self):
-        self.ser = serial.Serial(self.port, self.baudrate, timeout=1)
-        time.sleep(2)  # Allow time for serial connection to initialize
+def send_matrix(matrix):
+    print("Sending matrix to ESP:", matrix)
+    ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+    time.sleep(2)  # Wait for the serial connection to initialize
 
-    def close_connection(self):
-        if self.ser:
-            self.ser.close()
+    # Send each row followed by a newline character
+    for row in matrix:
+        line = ' '.join(row) + '\n'
+        ser.write(line.encode())
+        print(f"Sent row to ESP: {line.strip()}")  # Debug print statement for each row
 
-    def send_matrix(self, matrix):
-        if not self.ser:
-            print("Serial connection not established.")
-            return
+    ser.close()
+    print("Matrix sent to ESP successfully.")
+    
+    # Reopen the serial connection for reading
+    ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+    time.sleep(2)  # Wait for the serial connection to initialize
 
-        print("Sending matrix to ESP:", matrix)
-        for row in matrix:
-            line = ' '.join(row) + '\n'
-            self.ser.write(line.encode())
-            print(f"Sent row to ESP: {line.strip()}")
-        print("Matrix sent to ESP successfully.")
+    while(flag):
+        # Receive data from ESP32
+        received_data = ser.readline().decode().strip()
+        print("Received data from ESP:", received_data)
+        received_data = ser.readline().decode().strip()
+        print("Received data from ESP:", received_data)
+        
+        #store receive data in other function 
+        #store_data(received_data)
+        #sensor_info = received_data
 
-    def read_sensor_data(self):
-        if not self.ser:
-            print("Serial connection not established.")
-            return
-
-        print("Requesting sensor data from ESP...")
-        self.ser.write(b"REQUEST_SENSOR_DATA\n")
-        while True:
-            received_data = self.ser.readline().decode().strip()
-            if received_data:
-                print("Received data from ESP:", received_data)
-
-esp_comm = ESPCommunication()
-
-# Example usage
-if __name__ == '__main__':
-    esp_comm.open_connection()
-    # Assume matrix data is ready; this is just a placeholder
-    matrix = [["1", "0", "1"], ["0", "1", "0"], ["1", "0", "1"]]
-    esp_comm.send_matrix(matrix)
-    threading.Thread(target=esp_comm.read_sensor_data, daemon=True).start()
+    #ser.close()
+    #print(".")
+    
+    
+    def get_data(data):
+        return sensor_info
+        
+    #def store_data(data):
+        #sensor_info = data
+        
