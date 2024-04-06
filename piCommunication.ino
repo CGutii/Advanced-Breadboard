@@ -39,7 +39,8 @@ void loop() {
 }
 
 void processMatrix() {
-  String command = Serial.readStringUntil('\n').trim();
+  String command = Serial.readStringUntil('\n');
+  command.trim();
   int col = 0, row = 0;
   int startIndex = 0, endIndex = 0;
   // Reset current row to ensure processing starts from the beginning
