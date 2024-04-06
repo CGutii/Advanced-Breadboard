@@ -1,48 +1,105 @@
-import serial
-import time
+#include <Arduino.h>
+#include <Wire.h>
+#include "DFRobot_INA219.h"
 
-# Structure to store sensor data
-sensor_data = {
-    "Voltage": 0.0,
-    "Current": 0.0
+#define I2C_SDA 14
+#define I2C_SCL 13
+
+const int MATRIX_SIZE = 3;
+// Define the LED pins based on the matrix position
+const int ledPins[MATRIX_SIZE][MATRIX_SIZE] = {
+  {2, 25, 27},
+  {12, 17, 32},
+  {26, 16, 4}
+};
+
+//remember to adjust this value according to what board we are using
+DFRobot_INA219_IIC ina219(&Wire, INA219_I2C_ADDRESS1);
+
+// Revise the following two parameters according to actual reading of the INA219 and the multimeter
+// for linear calibration
+float ina219Reading_mA = 10000;
+float extMeterReading_mA = 1000;
+
+String matrix[MATRIX_SIZE][MATRIX_SIZE]; // Matrix to store the received values
+int currentRow = 0; // Current row being processed
+bool matrixReceived = false; // Flag to indicate if matrix is fully received
+
+void setup() {
+  Serial.begin(115200); // Begin serial communication at 9600 baud rate
+  
+  // Initialize the LED pins
+  for (int i = 0; i < MATRIX_SIZE; i++) {
+    for (int j = 0; j < MATRIX_SIZE; j++) {
+      pinMode(ledPins[i][j], OUTPUT);
+      digitalWrite(ledPins[i][j], LOW); // Turn off all LEDs initially
+    }
+  }
+
+  while (!Serial);
+
+    Wire.begin(I2C_SDA, I2C_SCL); // Initialize I2C communication
+
+    while (!ina219.begin()) {
+        Serial.println("INA219 begin failed");
+        delay(2000);
+    }
+
+    // Linear calibration b4 and after calibration 
+    ina219.linearCalibrate(ina219Reading_mA,extMeterReading_mA);
+    Serial.println();
+  
 }
 
-def send_matrix(matrix):
-    print("Sending matrix to ESP:", matrix)
-    with serial.Serial('/dev/ttyUSB0', 115200, timeout=1) as ser:
-        time.sleep(2)  # Wait for the serial connection to initialize
+void loop() {
+  if (Serial.available() > 0) {
+    String command = Serial.readStringUntil('\n');
+    command.trim();
 
-        # Send each row followed by a newline character
-        for row in matrix:
-            line = ' '.join(row) + '\n'
-            ser.write(line.encode())
-            print(f"Sent row to ESP: {line.strip()}")  # Debug print statement for each row
+    // Parse the received command into the matrix
+    int col = 0;
+    int index = 0;
+    while (index != -1 && col < MATRIX_SIZE) {
+      index = command.indexOf(' ');
+      String value = (index != -1) ? command.substring(0, index) : command;
+      matrix[currentRow][col++] = value;
+      command = (index != -1) ? command.substring(index + 1) : "";
+    }
 
-        print("Matrix sent to ESP successfully.")
+    // Turn on/off the LEDs for the current row
+    for (int col = 0; col < MATRIX_SIZE; col++) {
+      int ledState = matrix[currentRow][col].toInt();
+      digitalWrite(ledPins[currentRow][col], ledState);
+      if (ledState == HIGH) {
+        Serial.print("Turning on LED at pin ");
+        Serial.println(ledPins[currentRow][col]);
+      }
+    }
 
-def receive_sensor_data():
-    with serial.Serial('/dev/ttyUSB0', 115200, timeout=1) as ser:
-        time.sleep(2)  # Wait for the serial connection to initialize after sending matrix
-        while True:
-            if ser.in_waiting:
-                received_line = ser.readline().decode().strip()
-                if received_line.startswith("SENSOR_DATA"):
-                    _, voltage, current = received_line.split(',')
-                    # Update the global sensor_data dictionary
-                    sensor_data["Voltage"] = float(voltage)
-                    sensor_data["Current"] = float(current)
-                    print(f"Updated Sensor Data: Voltage = {voltage}V, Current = {current}mA")
+    currentRow++;
+    
+    // Check if the last row has been processed
+    if (currentRow == MATRIX_SIZE) {
+      matrixReceived = true;
+      Serial.println("Entire matrix received on ESP.");
+      // Reset for the next matrix
+      currentRow = 0;
+    }
 
-def send_matrix_and_receive_data(matrix):
-    send_matrix(matrix)
-    receive_sensor_data()  # Call the function to receive sensor data continuously
+    //this should print out the sensor info
+    //printSensorData();
+  }
 
-# Example usage
-if __name__ == "__main__":
-    # Placeholder matrix for demonstration. Replace with actual matrix data.
-    example_matrix = [
-        ["1", "0", "1"],
-        ["0", "1", "0"],
-        ["1", "0", "1"]
-    ]
-    send_matrix_and_receive_data(example_matrix)
+  //if it didn't print out, comment out the other function call and uncomment this one
+  printSensorData();
+}
+
+ void printSensorData() {
+     Serial.print("BusVoltage:   ");
+     Serial.print(ina219.getBusVoltage_V(), 2);
+     Serial.println("V");
+
+     Serial.print("Current:      ");
+     Serial.print(ina219.getCurrent_mA(), 1);
+     Serial.println("mA");
+ }
