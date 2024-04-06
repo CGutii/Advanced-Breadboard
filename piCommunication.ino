@@ -4,85 +4,102 @@
 
 #define I2C_SDA 14
 #define I2C_SCL 13
-DFRobot_INA219_IIC ina219(&Wire, INA219_I2C_ADDRESS1);
 
 const int MATRIX_SIZE = 3;
-const int ledPins[MATRIX_SIZE][MATRIX_SIZE] = {{2, 25, 27}, {12, 17, 32}, {26, 16, 4}};
+// Define the LED pins based on the matrix position
+const int ledPins[MATRIX_SIZE][MATRIX_SIZE] = {
+  {2, 25, 27},
+  {12, 17, 32},
+  {26, 16, 4}
+};
 
-String matrix[MATRIX_SIZE][MATRIX_SIZE];
-int currentRow = 0;
-bool matrixReceived = false;
+//remember to adjust this value according to what board we are using
+DFRobot_INA219_IIC ina219(&Wire, INA219_I2C_ADDRESS1);
+
+// Revise the following two parameters according to actual reading of the INA219 and the multimeter
+// for linear calibration
+float ina219Reading_mA = 10000;
+float extMeterReading_mA = 1000;
+
+String matrix[MATRIX_SIZE][MATRIX_SIZE]; // Matrix to store the received values
+int currentRow = 0; // Current row being processed
+bool matrixReceived = false; // Flag to indicate if matrix is fully received
 
 void setup() {
-    Serial.begin(115200);
-    Wire.begin(I2C_SDA, I2C_SCL);
-    for (int i = 0; i < MATRIX_SIZE; i++) {
-        for (int j = 0; j < MATRIX_SIZE; j++) {
-            pinMode(ledPins[i][j], OUTPUT);
-            digitalWrite(ledPins[i][j], LOW);
-        }
+  Serial.begin(115200); // Begin serial communication at 9600 baud rate
+  
+  // Initialize the LED pins
+  for (int i = 0; i < MATRIX_SIZE; i++) {
+    for (int j = 0; j < MATRIX_SIZE; j++) {
+      pinMode(ledPins[i][j], OUTPUT);
+      digitalWrite(ledPins[i][j], LOW); // Turn off all LEDs initially
     }
+  }
+
+  while (!Serial);
+
+    Wire.begin(I2C_SDA, I2C_SCL); // Initialize I2C communication
+
     while (!ina219.begin()) {
         Serial.println("INA219 begin failed");
         delay(2000);
     }
-    ina219.linearCalibrate(10000, 1000);
+
+    // Linear calibration b4 and after calibration 
+    ina219.linearCalibrate(ina219Reading_mA,extMeterReading_mA);
+    Serial.println();
+  
 }
 
 void loop() {
-    if (Serial.available() > 0 && !matrixReceived) {
-        processMatrix();
+  if (Serial.available() > 0) {
+    String command = Serial.readStringUntil('\n');
+    command.trim();
+
+    // Parse the received command into the matrix
+    int col = 0;
+    int index = 0;
+    while (index != -1 && col < MATRIX_SIZE) {
+      index = command.indexOf(' ');
+      String value = (index != -1) ? command.substring(0, index) : command;
+      matrix[currentRow][col++] = value;
+      command = (index != -1) ? command.substring(index + 1) : "";
     }
-    if (matrixReceived) {
-        printSensorData();
-    }
-}
 
-void processMatrix() {
-  String command = Serial.readStringUntil('\n');
-  command.trim();
-  int col = 0, row = 0;
-  int startIndex = 0, endIndex = 0;
-  // Reset current row to ensure processing starts from the beginning
-  currentRow = 0;
-  
-  // Process the entire matrix
-  for (row = 0; row < MATRIX_SIZE; row++) {
-    endIndex = command.indexOf(';', startIndex);
-    String matrixRow = command.substring(startIndex, endIndex);
-    col = 0;
-
-    int spaceIndex = -1;
-    while ((spaceIndex = matrixRow.indexOf(' ', spaceIndex + 1)) != -1) {
-      String value = matrixRow.substring(0, spaceIndex);
-      matrix[row][col++] = value;
-      matrixRow = matrixRow.substring(spaceIndex + 1);
-    }
-    matrix[row][col] = matrixRow; // Last value in the row
-    startIndex = endIndex + 1; // Move to the start of the next row in the command string
-  }
-
-  matrixReceived = true;
-  Serial.println("MATRIX_RECEIVED");
-
-  // After matrix processing, turn on/off LEDs
-  for (row = 0; row < MATRIX_SIZE; row++) {
-    for (col = 0; col < MATRIX_SIZE; col++) {
-      int ledState = matrix[row][col].toInt();
-      digitalWrite(ledPins[row][col], ledState ? HIGH : LOW);
+    // Turn on/off the LEDs for the current row
+    for (int col = 0; col < MATRIX_SIZE; col++) {
+      int ledState = matrix[currentRow][col].toInt();
+      digitalWrite(ledPins[currentRow][col], ledState);
       if (ledState == HIGH) {
         Serial.print("Turning on LED at pin ");
-        Serial.println(ledPins[row][col]);
+        Serial.println(ledPins[currentRow][col]);
       }
     }
+
+    currentRow++;
+    
+    // Check if the last row has been processed
+    if (currentRow == MATRIX_SIZE) {
+      matrixReceived = true;
+      Serial.println("Entire matrix received on ESP.");
+      // Reset for the next matrix
+      currentRow = 0;
+    }
+
+    //this should print out the sensor info
+    //printSensorData();
+  }
+
+  if (matrixReceived) {
+    Serial.println("MATRIX_RECEIVED");  // Confirm matrix reception
+    printSensorData();  // Continuously send sensor data after matrix processing
   }
 }
-
 
 void printSensorData() {
     Serial.print("SENSOR_DATA,");
     Serial.print(ina219.getBusVoltage_V(), 2);
     Serial.print(",");
     Serial.println(ina219.getCurrent_mA(), 1);
-    delay(1000); // Adjust delay as needed
+    delay(1000); // Adjust delay as needed for continuous data sending
 }
