@@ -80,10 +80,12 @@ void loop() {
     
     // Check if the last row has been processed
     if (currentRow == MATRIX_SIZE) {
-      matrixReceived = true;
+      //matrixReceived = true;
       Serial.println("Entire matrix received on ESP.");
       // Reset for the next matrix
       currentRow = 0;
+      //printSensorData();  // Continuously send sensor data after matrix processing
+
     }
 
     //this should print out the sensor info
@@ -92,14 +94,22 @@ void loop() {
 
   //if (matrixReceived) {
     //Serial.println("MATRIX_RECEIVED");  // Confirm matrix reception
-    printSensorData();  // Continuously send sensor data after matrix processing
+    //printSensorData();  // Continuously send sensor data after matrix processing
   //}
+  // New - Check if it's time to send sensor data without blocking
+  static unsigned long lastSensorDataMillis = 0;
+  if (millis() - lastSensorDataMillis > 3000) { // Adjust as needed
+    printSensorData();
+    lastSensorDataMillis = millis();
+  }
 }
 
 void printSensorData() {
+  while(1){
     Serial.print("Voltage:");
     Serial.print(ina219.getBusVoltage_V(), 2);
     Serial.print("  Current:");
     Serial.print(ina219.getCurrent_mA(), 1);
     delay(3000); // Adjust delay as needed for continuous data sending
+  }
 }
