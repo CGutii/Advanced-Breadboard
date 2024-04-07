@@ -3,8 +3,11 @@ from tkinter import messagebox, simpledialog
 from circuit_graph import CircuitGraph
 from translate_screen import TranslateScreen
 from help_screen import HelpScreen
-from espCommunication import esp_comm
 import threading
+from espCommunication import ESPCommunication  # Import the class
+
+# Create an instance of the ESPCommunication class
+esp_comm = ESPCommunication()
 
 
 # Updated to track the count of each component type, now including 'Junction'
@@ -284,7 +287,7 @@ class CircuitSimulator:
 
         # Create a thread to send the matrix without blocking the GUI
         matrix = translate_app.generate_matrix_for_esp()
-        send_thread = threading.Thread(target=esp_comm.send_matrix_and_receive_data, args=(matrix,))
+        send_thread = threading.Thread(target=esp_comm.send_matrix, args=(matrix,))
         send_thread.start()
 
         # Optional: print a message to the console
