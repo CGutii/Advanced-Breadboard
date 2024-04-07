@@ -1,6 +1,10 @@
 import tkinter as tk
 import random
-from espCommunication import get_sensor_data
+import re
+from espCommunication import ESPCommunication  # Import the class
+
+# Create an instance of the ESPCommunication class
+esp_comm = ESPCommunication()
 
 class TranslateScreen:
     def __init__(self, master, num_nodes=0, connections=[]):
@@ -12,10 +16,13 @@ class TranslateScreen:
         self.dot_colors = ['red', 'yellow', 'green']  # Colors for each column
         self.draw_grid()
         self.display_connections()
-        self.sensor_data_btn = tk.Button(master, text="Get Sensor Data", command=self.display_sensor_data)
+        self.sensor_data_btn = tk.Button(master, text="Get Sensor Data", command=self.update_sensor_data_and_warnings)
         self.sensor_data_btn.pack()
         self.sensor_data_label = tk.Label(master, text="Sensor Data: Not fetched yet")
         self.sensor_data_label.pack()
+        self.warning_label = tk.Text(master, height=4, width=30)
+        self.warning_label.pack()
+        self.warning_label.configure(state='disabled')
         
     def draw_grid(self):
         self.dot_radius = 10
@@ -69,9 +76,39 @@ class TranslateScreen:
         return matrix
     
     def display_sensor_data(self):
-        sensor_data = get_sensor_data()  # Call the function from espCommunication.py
+        sensor_data = esp_comm.get_sensor_data()  # Call the function from espCommunication.py
         self.sensor_data_label.config(text=f"Sensor Data: {sensor_data}")
 
+    def update_sensor_data_and_warnings(self):
+        sensor_data = get_sensor_data()  # Fetch the latest sensor data
+        self.sensor_data_label.config(text=f"Sensor Data: {sensor_data}")
+        short_circuit, open_circuit = self.getIntegerSensorData(sensor_data)
+        self.update_warnings(short_circuit, open_circuit)
+
+    def getIntegerSensorData(self, sensor_data):
+        numbers = re.findall(r"[-+]?\d*\.\d+|\d+", sensor_data)
+        if numbers:
+            voltage, current = map(float, numbers[:2])
+            short_circuit = voltage == 0
+            open_circuit = current < 2
+        else:
+            short_circuit, open_circuit = False, False
+        return short_circuit, open_circuit
+
+    def update_warnings(self, short_circuit, open_circuit):
+        warning_text = "Warning:"
+        if short_circuit:
+            warning_text += "\nPotential Short Circuit"
+        if open_circuit:
+            warning_text += "\nPotential Open Circuit"
+        
+        self.warning_label.configure(state='normal')
+        self.warning_label.delete('1.0', tk.END)
+        if warning_text == "Warning:":
+            self.warning_label.insert(tk.END, "No warnings")
+        else:
+            self.warning_label.insert(tk.END, warning_text)
+        self.warning_label.configure(state='disabled')
 
 
 if __name__ == "__main__":
