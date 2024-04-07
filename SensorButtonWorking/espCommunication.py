@@ -2,30 +2,56 @@
 import serial
 import time
 
-flag = True
-sensor_info = ""  # This will store the last received sensor data
+# Initialize serial port - adjust '/dev/ttyUSB0' as per your setup
+SERIAL_PORT = '/dev/ttyUSB0'
+BAUD_RATE = 115200
 
 def send_matrix(matrix):
-    global sensor_info
+    """
+    Sends a matrix to the ESP device and waits for a confirmation
+    or sensor data response.
+    """
     print("Sending matrix to ESP:", matrix)
-    ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
-    time.sleep(2)  # Wait for the serial connection to initialize
+    with serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1) as ser:
+        time.sleep(2)  # Wait for the serial connection to initialize
 
-    for row in matrix:
-        line = ' '.join(row) + '\n'
-        ser.write(line.encode())
-        print(f"Sent row to ESP: {line.strip()}")  # Debug print statement for each row
+        for row in matrix:
+            line = ' '.join(row) + '\n'
+            ser.write(line.encode())
+            print(f"Sent row to ESP: {line.strip()}")  # Debug print statement for each row
 
-    # Assuming the sensor data is continuously being sent, read the latest available data
-    while True:
-        if ser.inWaiting() > 0:
-            received_data = ser.readline().decode().strip()
-            print("Received data from ESP:", received_data)
-            sensor_info = received_data  # Store the latest sensor data
-            break
+        # After sending the matrix, wait for the ESP device to process
+        # and return the sensor data.
+        ser.flush()  # Ensure all data is sent
+        request_sensor_data(ser)
 
-    ser.close()
+def request_sensor_data(ser):
+    """
+    Requests the sensor data from the ESP device.
+    """
+    print("Requesting sensor data from ESP...")
+    ser.write(b"GET_SENSOR_DATA\n")  # Command to ESP to send back sensor data
+    
+    # Wait for the sensor data response
+    sensor_info = ser.readline().decode().strip()
+    print("Received sensor data from ESP:", sensor_info)
 
 def get_sensor_data():
-    global sensor_info
-    return sensor_info
+    """
+    A placeholder function if you need to fetch sensor data directly.
+    Adjust this function as per your requirement.
+    """
+    with serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1) as ser:
+        time.sleep(2)  # Wait for the serial connection to initialize
+        ser.write(b"GET_SENSOR_DATA\n")  # Send command to get sensor data
+        sensor_info = ser.readline().decode().strip()
+        print("Received sensor data from ESP:", sensor_info)
+        return sensor_info
+
+# # Example usage
+# if __name__ == "__main__":
+#     # Example matrix to send
+#     matrix = [["1", "0", "1"], ["0", "1", "0"], ["1", "0", "1"]]
+#     send_matrix(matrix)
+#     # Later on, you can directly call get_sensor_data() if needed
+#     # sensor_data = get_sensor_data()
