@@ -2,6 +2,7 @@
 import serial
 import time
 
+flag = True
 sensor_info = ""  # This will store the last received sensor data
 
 def send_matrix(matrix):
@@ -16,12 +17,11 @@ def send_matrix(matrix):
         print(f"Sent row to ESP: {line.strip()}")  # Debug print statement for each row
 
     # Assuming the sensor data is continuously being sent, read the latest available data
-    while True:
-        if ser.inWaiting() > 0:
-            received_data = ser.readline().decode().strip()
-            print("Received data from ESP:", received_data)
-            sensor_info = received_data  # Store the latest sensor data
-            break
+    if ser.inWaiting() > 0:
+        received_data = ser.readline().decode().strip()
+        print("Received data from ESP:", received_data)
+        sensor_info = received_data  # Store the latest sensor data
+        #break
 
     ser.close()
 
