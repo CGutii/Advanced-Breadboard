@@ -53,6 +53,7 @@ void setup() {
 
 void loop() {
   if (Serial.available() > 0) {
+    printSensorData();
     String command = Serial.readStringUntil('\n');
     command.trim();
 
@@ -88,8 +89,7 @@ void loop() {
 
     }
 
-    //this should print out the sensor info
-    //printSensorData();
+
   }
 
   //if (matrixReceived) {
@@ -97,19 +97,17 @@ void loop() {
     //printSensorData();  // Continuously send sensor data after matrix processing
   //}
   // New - Check if it's time to send sensor data without blocking
-  static unsigned long lastSensorDataMillis = 0;
-  if (millis() - lastSensorDataMillis > 3000) { // Adjust as needed
-    printSensorData();
-    lastSensorDataMillis = millis();
-  }
+  // static unsigned long lastSensorDataMillis = 0;
+  // if (millis() - lastSensorDataMillis > 3000) { // Adjust as needed
+  //   printSensorData();
+  //   lastSensorDataMillis = millis();
+  // }
 }
 
 void printSensorData() {
-  while(1){
     Serial.print("Voltage:");
     Serial.print(ina219.getBusVoltage_V(), 2);
     Serial.print("  Current:");
     Serial.print(ina219.getCurrent_mA(), 1);
     delay(3000); // Adjust delay as needed for continuous data sending
-  }
 }
