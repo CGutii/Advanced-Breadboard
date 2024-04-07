@@ -3,7 +3,7 @@ import serial
 import time
 
 flag = True
-sensor_info = "Voltage:4.00  Current:5.0"  # This will store the last received sensor data
+sensor_info = ""  # This will store the last received sensor data
 
 def send_matrix(matrix):
     global sensor_info
