@@ -86,7 +86,7 @@ class TranslateScreen:
         numbers = re.findall(r"[-+]?\d*\.\d+|\d+", sensor_data)
         if numbers:
             voltage, current = map(float, numbers[:2])
-            short_circuit = voltage == 0
+            short_circuit = voltage < 1
             open_circuit = current < 2
         else:
             short_circuit, open_circuit = False, False
