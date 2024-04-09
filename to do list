@@ -1,0 +1,8 @@
+-wrong led turns on, only the top left one for some reason (pin 2).
+-some but not all the sensor info prints. For example:
+"Error: Unable to parse sensor data string
+Received sensor data: Ready for Sensor Data?BusVoltage:   2.81V
+Error: Unable to parse sensor data string
+Received sensor data: Ready for Sensor Data?BusVoltage:   2.81V"
+
+
