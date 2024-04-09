@@ -1,7 +1,1 @@
-Traceback (most recent call last):
-  File "/home/guti/Advanced Breadboard/ButtonWorking/circuit_similator.py", line 4, in <module>
-    from translate_screen import TranslateScreen
-  File "/home/guti/Advanced Breadboard/ButtonWorking/translate_screen.py", line 4, in <module>
-    from espCommunication import get_sensor_data
-ImportError: cannot import name 'get_sensor_data' from 'espCommunication' (/home/guti/Advanced Breadboard/ButtonWorking/espCommunication.py)
-
+Voltage:3.00  Current:6.0
