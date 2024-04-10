@@ -1,1 +1,3 @@
 0 0 0 0 0 0 0 0 0
+
+res = (re.sub('.', lambda x: r'\u % 04X' % ord(x.group()), test_str))
