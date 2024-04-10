@@ -1,1 +1,2 @@
 Links to send to each other for reference:
+https://www.geeksforgeeks.org/python-convert-string-to-unicode-characters/
