@@ -1,0 +1,17 @@
+# To-Do List
+
+## High Priority
+- [ ] Fix placement errors on Circuit Sim GUI (double click logic)
+- [ ] Fix Edit and Delete button functionality
+- [ ] Add components on the translate screen
+
+## Medium Priority
+- [ ] Turn on off/Reset LEDs after initial translation
+- [ ] Fix and adjust Help Screen
+- [ ] Adjust connections dispaly on Translate Screen
+
+## Low Priority
+- [ ] Adjust Colors on Translate Screen to match LEDs
+- [ ] Use Custom Tkinter for making aesthetically better
+
+## Completed
