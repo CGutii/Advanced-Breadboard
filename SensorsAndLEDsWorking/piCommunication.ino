@@ -93,6 +93,10 @@ void loop() {
       GetSensorData();
     }
 
+    if (information == "RESET_PINS") {
+      resetPins();
+    }
+
   }
 }
 
@@ -183,5 +187,17 @@ int getLedPin(int index) {
     case 8: return led9;
     default: return -1; // Invalid index
   }
+}
+
+void resetPins() {
+  digitalWrite(led1, LOW);
+  digitalWrite(led2, LOW);
+  digitalWrite(led3, LOW);
+  digitalWrite(led4, LOW);
+  digitalWrite(led5, LOW);
+  digitalWrite(led6, LOW);
+  digitalWrite(led7, LOW);
+  digitalWrite(led8, LOW);
+  digitalWrite(led9, LOW);
 }
 
