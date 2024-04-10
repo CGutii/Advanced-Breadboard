@@ -80,9 +80,22 @@ class TranslateScreen:
         self.sensor_data_label.config(text=f"Sensor Data: {sensor_data}")
 
     def update_sensor_data_and_warnings(self):
-        sensor_data = get_sensor_data()  # Fetch the latest sensor data
-        self.sensor_data_label.config(text=f"Sensor Data: {sensor_data}")
-        short_circuit, open_circuit = self.getIntegerSensorData(sensor_data)
+        # Fetch the latest sensor data
+        sensor_data_str = self.circuit_simulator.get_sensor_data()
+
+        # Parse the sensor data string using regular expressions
+        match = re.match(r"Voltage:(\d+\.\d+) Current:(\d+\.\d+)", sensor_data_str)
+        if match:
+            voltage = float(match.group(1))
+            current = float(match.group(2))
+        else:
+            #print("Error: Unable to parse sensor data string")
+            #print("Received sensor data:", sensor_data_str)
+            return
+
+        # Update the sensor data label and warnings
+        self.sensor_data_label.config(text=f"Sensor Data: Voltage={voltage}, Current={current}")
+        short_circuit, open_circuit = self.getIntegerSensorData(voltage, current)
         self.update_warnings(short_circuit, open_circuit)
 
     def getIntegerSensorData(self, sensor_data):
