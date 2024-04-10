@@ -1,0 +1,1 @@
+This folder contains everything that was worked on throughout the course of this project that did not make it to the final product. This mainly includes previous iterations of the project with some working code and some incomplete code. This folder is not needed to run the full working program, it is here to be looked back at as reference material.
