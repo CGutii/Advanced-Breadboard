@@ -81,7 +81,7 @@ class TranslateScreen:
 
     def update_sensor_data_and_warnings(self):
         # Fetch the latest sensor data
-        sensor_data_str = esp_comm.get_sensor_data()  # Call the function from espCommunication.py
+        sensor_data_str = self.circuit_simulator.get_sensor_data()  # Call the function from espCommunication.py
     
         # Parse the sensor data string
         voltage, current = self.parse_sensor_data(sensor_data_str)
