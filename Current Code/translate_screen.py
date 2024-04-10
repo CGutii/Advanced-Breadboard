@@ -81,22 +81,23 @@ class TranslateScreen:
 
     def update_sensor_data_and_warnings(self):
         # Fetch the latest sensor data
-        sensor_data_str = self.circuit_simulator.get_sensor_data()
-
-        # Parse the sensor data string using regular expressions
-        match = re.match(r"Voltage:(\d+\.\d+) Current:(\d+\.\d+)", sensor_data_str)
-        if match:
-            voltage = float(match.group(1))
-            current = float(match.group(2))
-        else:
-            #print("Error: Unable to parse sensor data string")
-            #print("Received sensor data:", sensor_data_str)
-            return
-
+        sensor_data_str = esp_comm.get_sensor_data()  # Call the function from espCommunication.py
+    
+        # Parse the sensor data string
+        voltage, current = self.parse_sensor_data(sensor_data_str)
+    
         # Update the sensor data label and warnings
         self.sensor_data_label.config(text=f"Sensor Data: Voltage={voltage}, Current={current}")
         short_circuit, open_circuit = self.getIntegerSensorData(voltage, current)
         self.update_warnings(short_circuit, open_circuit)
+
+    def parse_sensor_data(self, sensor_data_str):
+        # Split the sensor data string into voltage and current components
+        voltage_str, current_str = sensor_data_str.split()
+    
+        # Return the voltage and current values as floats
+        return float(voltage_str), float(current_str)
+
 
     def getIntegerSensorData(self, sensor_data):
         numbers = re.findall(r"[-+]?\d*\.\d+|\d+", sensor_data)
