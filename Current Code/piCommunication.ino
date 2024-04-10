@@ -68,7 +68,7 @@ void setup() {
 
     // Linear calibration b4 and after calibration 
     ina219.linearCalibrate(ina219Reading_mA,extMeterReading_mA);
-    Serial.println();
+    //Serial.println();
 }
 
 
@@ -76,44 +76,64 @@ void loop() {
   
   if (Serial.available() > 0) {
     String information = Serial.readStringUntil('\n');
+    //Serial.println(information);
     information.trim();
-    //Serial.println(information);
-    // Remove the 'b' prefix
-    if (information.startsWith("b")) {
-      information.remove(0, 1); // Remove the first character
-    }
 
-    // Remove single quotes if present
-    if (information.startsWith("'") && information.endsWith("'")) {
-      information.remove(0, 1); // Remove the first character
-      information.remove(information.length() - 1); // Remove the last character
-    }
-
-    //Serial.println(information);
+    Serial.println(information);
 
     // if information is matrix then process and turn on LEDS
-    if(matrixReceived == false)
-    processMatrix(information);
+    if(matrixReceived == false){
+      //Serial.println(information);
+      processMatrix(information);
+    }
 
     //if info is a char (get sensor stuff)
-    if (information == "GET_SENSOR_DATA")
-    GetSensorData();
+    if (information == "GET_SENSOR_DATA"){
+      //Serial.end();
+      GetSensorData();
+    }
+
+    if (information == "RESET_PINS") {
+      resetPins();
+    }
 
   }
 }
 
 // serial print sensor data
 void GetSensorData() {
+  //Serial.begin(115200);
   // send request to send data
-  Serial.print("Ready for Sensor Data?");
+  //Serial.write("Ready for Sensor Data?");
 
   //Serial.print("BusVoltage:   ");
-  Serial.print(ina219.getBusVoltage_V(), 2);
-  Serial.print("V");
+  //int voltage = (int)ina219.getBusVoltage_V();
+  //int current = (int)ina219.getCurrent_mA();
+  //Serial.write(voltage);
+  //Serial.write(current);
+  Serial.flush();
+  
 
-  //Serial.print("Current:      ");
-  Serial.print(ina219.getCurrent_mA(), 1);
+  float busVoltage = ina219.getBusVoltage_V();
+  float current = ina219.getCurrent_mA();
+
+  
+  // Convert float to string
+  String busVoltageString = String(busVoltage, 2); // 2 decimal places
+  String currentString = String(current, 2); // 2 decimal places
+  
+  // Write the string over serial
+  Serial.print(busVoltageString);
+  Serial.print("V ");
+  Serial.print(currentString);
   Serial.print("mA");
+
+   //Serial.write(ina219.getBusVoltage_V(), 2);
+   //Serial.write("V   ");
+
+   //Serial.print("Current:      ");
+   //Serial.write(ina219.getCurrent_mA(), 1);
+   //Serial.write("mA");
   //delay(1000);
     //Serial.println("here");
   
@@ -169,3 +189,14 @@ int getLedPin(int index) {
   }
 }
 
+void resetPins() {
+  digitalWrite(led1, LOW);
+  digitalWrite(led2, LOW);
+  digitalWrite(led3, LOW);
+  digitalWrite(led4, LOW);
+  digitalWrite(led5, LOW);
+  digitalWrite(led6, LOW);
+  digitalWrite(led7, LOW);
+  digitalWrite(led8, LOW);
+  digitalWrite(led9, LOW);
+}
