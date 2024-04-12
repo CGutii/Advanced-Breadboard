@@ -378,16 +378,15 @@ class CircuitSimulator:
 
 
 
-    def open_translate_screen(self):
-        self.circuit_graph.merge_nodes_by_junction()
-        self.print_connections()
+    self.print_connections()
 
-        self.circuit_graph.merge_nodes_by_junction()
         node_to_components = self.circuit_graph.get_all_connections()
 
         translate_window = tk.Toplevel(self.master)
         translate_window.title("Translate Screen")
         translate_app = TranslateScreen(translate_window, self, num_nodes=len(node_to_components), connections=node_to_components)
+        
+        # Call this method before generate_matrix_for_esp
         translate_app.color_dots_based_on_nodes(len(node_to_components))
 
         # Create a thread to send the matrix without blocking the GUI
