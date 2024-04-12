@@ -2,17 +2,21 @@
 
 ## High Priority
 - [X] Fix placement errors on Circuit Sim GUI (double click logic)
-- [~] Fix Edit and Delete button functionality    *NOTE: A reset button was added instead*
 - [ ] Add components on the translate screen
+- [ ] Node labeling
 
 ## Medium Priority
 - [X] Give option to turn off/Reset LEDs after initial translation
-- [ ] Fix and adjust Help Screen
 - [X] Adjust connections dispaly on Translate Screen
+- [ ] Color LEDs
+- [ ] clear circuit button
+
 
 ## Low Priority
 - [X] Adjust Colors on Translate Screen to match LEDs
 - [ ] Use Custom Tkinter for making aesthetically better
 - [X] Add clear screen / reset button on main GUI
+- [~] Fix Edit and Delete button functionality    *NOTE: A reset button was added instead*
+- [ ] Fix and adjust Help Screen
 
 ## Completed
