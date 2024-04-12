@@ -8,7 +8,7 @@
 ## Medium Priority
 - [ ] Turn on off/Reset LEDs after initial translation
 - [ ] Fix and adjust Help Screen
-- [ ] Adjust connections dispaly on Translate Screen
+- [X] Adjust connections dispaly on Translate Screen
 
 ## Low Priority
 - [ ] Adjust Colors on Translate Screen to match LEDs
