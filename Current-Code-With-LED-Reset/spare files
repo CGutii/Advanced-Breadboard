@@ -1,1 +1,34 @@
+def color_dots_based_on_nodes(self, num_nodes):
+        # Reset the colors and labels on the dots
+        for i in range(3):
+            for j in range(3):
+                self.canvas.itemconfig(f'dot_{i}_{j}', fill='black')
+                self.canvas.delete(f"dot_label_{i}_{j}")
 
+        # If there are no nodes, nothing else needs to be done
+        if num_nodes == 0:
+            return
+
+        # Assign colors and labels based on the connections
+        for node_label in sorted(self.connections.keys()):
+            i, j = divmod(len(self.dots_to_color), 3)  # Assign grid position based on current number of colored dots
+            x = 100 + i * self.grid_size
+            y = 100 + j * self.grid_size
+            color = self.dot_colors[i]  # Color based on the column
+            # Update the color of the dot
+            self.canvas.itemconfig(f'dot_{i}_{j}', fill=color)
+            # Add the label on the dot
+            self.canvas.create_text(x, y, text=node_label, fill='white', tags=(f"dot_label_{i}_{j}"))
+            self.dots_to_color.append((i, j))  # Keep track of which dots are colored
+
+    def display_connections(self):
+        self.canvas.delete("connections")  # Delete previous connections text if any
+        connections_text = ""
+        for node_label, components in self.connections.items():
+            connections_text += f"Node \"{node_label}\" connections:\n"
+            for component in components:
+                connections_text += f"- {component.label}\n"  # Use component.label to display the label
+            connections_text += "\n"
+        
+        # Place the connections text on the canvas
+        self.canvas.create_text(500, 50, text=connections_text.strip(), anchor="nw", fill="black", tags="connections")
