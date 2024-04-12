@@ -1,20 +1,24 @@
 import tkinter as tk
 from tkinter import messagebox, simpledialog
-from circuit_graph import CircuitGraph
 from translate_screen import TranslateScreen
 from help_screen import HelpScreen
 import threading
-from espCommunication import ESPCommunication  # Import the class
+import serial
+import time
+from circuit_graph import CircuitGraph
+# from espCommunication import ESPCommunication  # Import the class
 
-# Create an instance of the ESPCommunication class
-esp_comm = ESPCommunication()
+
+
+SERIAL_PORT = '/dev/ttyUSB0'
+BAUD_RATE = 115200
 
 
 # Updated to track the count of each component type, now including 'Junction'
 component_count = {"R": 0, "C": 0, "V": 0, "L": 0, "Ground": 0, "Junction": 0}
 
 class Component:
-    def __init__(self, canvas, x, y, label="", value=0, is_junction=False):  # Ensure this line is correct
+    def __init__(self, canvas, x, y, label="", value=0, is_junction=False):
         self.canvas = canvas
         self.x = x
         self.y = y
@@ -22,14 +26,37 @@ class Component:
         self.value = value
         self.id = []
         self.is_junction = is_junction
+        self.label_id = None  # Track the canvas ID of the label for easy update
 
-    def draw(self):
-        pass
+    def draw_label(self):
+        # Create or update the label text
+        if self.label_id:
+            self.canvas.itemconfig(self.label_id, text=self.label_text())
+        else:
+            self.label_id = self.canvas.create_text(self.x, self.y+20, text=self.label_text())
+
+    def show_value(self):
+        if self.label_id:
+            self.canvas.itemconfig(self.label_id, text=self.label_text())  # Show full label text with value and unit
+
+    def hide_value(self):
+        if self.label_id:
+            self.canvas.itemconfig(self.label_id, text=self.label)  # Show only the label name
+
+    def label_text(self):
+        # This method should be overridden in each subclass to include the unit
+        return f"{self.label}: {self.value}"
 
     def delete(self):
         for item_id in self.id:
             self.canvas.delete(item_id)
-        self.id = []
+        if self.label_id:
+            self.canvas.delete(self.label_id)
+            self.label_id = None  # Reset label ID after deletion
+        self.id.clear()
+
+    def draw(self):
+        pass
 
     def edit(self):
         pass
@@ -37,6 +64,7 @@ class Component:
     def redraw(self):
         self.delete()
         self.draw()
+
 
 class Junction(Component):
     def __init__(self, canvas, x, y):
@@ -56,8 +84,11 @@ class Resistor(Component):
     def draw(self):
         self.delete()
         self.id.append(self.canvas.create_rectangle(self.x-10, self.y-5, self.x+10, self.y+5, fill="gray"))
-        self.id.append(self.canvas.create_text(self.x, self.y+20, text=f"{self.label}: {self.value}Ω"))
+        self.draw_label()
 
+    def label_text(self):
+        return f"{self.label}: {self.value}Ω"
+    
     def edit(self):
         new_label = simpledialog.askstring("Edit Label", "Enter new label:", initialvalue=self.label)
         if new_label:
@@ -76,8 +107,11 @@ class DCPowerSource(Component):
     def draw(self):
         self.delete()
         self.id.append(self.canvas.create_oval(self.x-10, self.y-15, self.x+10, self.y+15, outline="black", fill="yellow"))
-        self.id.append(self.canvas.create_text(self.x, self.y+25, text=f"{self.label}: {self.value}V"))
+        self.draw_label()
 
+    def label_text(self):
+        return f"{self.label}: {self.value}V"
+    
     def edit(self):
         new_label = simpledialog.askstring("Edit Label", "Enter new label:", initialvalue=self.label)
         if new_label:
@@ -98,13 +132,10 @@ class Ground(Component):
         self.id.append(self.canvas.create_line(self.x-10, self.y, self.x+10, self.y, fill="green"))
         self.id.append(self.canvas.create_line(self.x-7, self.y+5, self.x+7, self.y+5, fill="green"))
         self.id.append(self.canvas.create_line(self.x-4, self.y+10, self.x+4, self.y+10, fill="green"))
-        self.id.append(self.canvas.create_text(self.x, self.y+20, text=self.label))
+        self.draw_label()
 
-    def edit(self):
-        new_label = simpledialog.askstring("Edit Label", "Enter new label:", initialvalue=self.label)
-        if new_label:
-            self.label = new_label
-        self.redraw()
+    # def label_text(self):
+    #     return f"{self.label}"
 
 class Inductor(Component):
     def __init__(self, canvas, x, y):
@@ -115,8 +146,11 @@ class Inductor(Component):
     def draw(self):
         self.delete()
         self.id.append(self.canvas.create_line(self.x-15, self.y, self.x+15, self.y, fill="purple", arrow=tk.BOTH))
-        self.id.append(self.canvas.create_text(self.x, self.y+20, text=f"{self.label}: {self.value}H"))
+        self.draw_label()
 
+    def label_text(self):
+        return f"{self.label}: {self.value}H"
+    
     def edit(self):
         new_label = simpledialog.askstring("Edit Label", "Enter new label:", initialvalue=self.label)
         if new_label:
@@ -136,7 +170,10 @@ class Capacitor(Component):
         self.delete()
         self.id.append(self.canvas.create_line(self.x-5, self.y-10, self.x-5, self.y+10, fill="blue"))
         self.id.append(self.canvas.create_line(self.x+5, self.y-10, self.x+5, self.y+10, fill="blue"))
-        self.id.append(self.canvas.create_text(self.x, self.y+20, text=f"{self.label}: {self.value}F"))
+        self.draw_label()
+
+    def label_text(self):
+        return f"{self.label}: {self.value}F"
 
     def edit(self):
         new_label = simpledialog.askstring("Edit Label", "Enter new label:", initialvalue=self.label)
@@ -165,6 +202,32 @@ class Wire(Component):
         if self.end_x is not None and self.end_y is not None:
             self.delete()
             self.id.append(self.canvas.create_line(self.x, self.y, self.end_x, self.end_y, fill="black"))
+    
+
+class ObservableSet(set):
+    def __init__(self, *args, name="", **kwargs):
+        super().__init__(*args, **kwargs)
+        self.name = name
+
+    def add(self, elem):
+        print(f"Adding {elem} to {self.name}")
+        super().add(elem)
+
+    def remove(self, elem):
+        print(f"Removing {elem} from {self.name}")
+        super().remove(elem)
+
+    def discard(self, elem):
+        print(f"Discarding {elem} from {self.name}")
+        super().discard(elem)
+
+    def update(self, *args):
+        print(f"Updating {self.name} with {args}")
+        super().update(*args)
+
+    def clear(self):
+        print(f"Clearing all elements from {self.name}")
+        super().clear()
 
 
 class CircuitSimulator:
@@ -177,11 +240,13 @@ class CircuitSimulator:
         self.is_edit_mode = False
         self.wire_start_x = None
         self.wire_start_y = None
+        self.show_values = False
         self.component_objects = []
         self.occupied_positions = set()
         self.wire_connections = set()
         self.circuit_graph = CircuitGraph()
         self.setup_ui()
+        
 
     def setup_ui(self):
         self.canvas = tk.Canvas(self.master, width=400, height=200, bg='white')
@@ -206,6 +271,9 @@ class CircuitSimulator:
         self.add_tool_button("Delete", self.toggle_delete_mode, tools_frame)
         self.add_tool_button("Connections", self.print_connections, tools_frame)
         self.add_tool_button("Edit", self.enable_edit_mode, tools_frame)
+        self.add_tool_button("Toggle Values", self.toggle_values, tools_frame)
+        self.add_tool_button("Reset", self.reset_circuit, tools_frame)
+
 
         self.add_tool_button("Translate", self.open_translate_screen, help_frame)
         self.add_tool_button("Help", self.open_help_screen, help_frame)
@@ -218,6 +286,16 @@ class CircuitSimulator:
         label.pack(fill='x')
         frame.pack(fill='x')
         return frame
+    
+    def toggle_values(self):
+        self.show_values = not self.show_values
+        for component in self.component_objects:
+            if self.show_values:
+                component.show_value()
+            else:
+                component.hide_value()
+
+
     
     def open_help_screen(self):
         help_window = tk.Toplevel(self.master)
@@ -273,6 +351,27 @@ class CircuitSimulator:
     #                 connections.append((node.id, connected_node.id))  # Adjust based on your structure
     #     return connections
 
+    def reset_circuit(self):
+        if messagebox.askyesno("Reset Circuit", "Are you sure you want to reset the circuit?"):
+            # Remove only the components, not the entire canvas
+            for comp in self.component_objects:
+                comp.delete()
+
+            # Reset component counts
+            global component_count
+            component_count = {key: 0 for key in component_count}
+
+            # Clear all components from the graph
+            self.circuit_graph.reset_graph()
+
+            # Clear the lists and sets tracking components and positions
+            self.component_objects.clear()
+            self.occupied_positions.clear()
+
+            print("Circuit components have been reset.")
+
+
+
     def open_translate_screen(self):
         self.circuit_graph.merge_nodes_by_junction()
         self.print_connections()
@@ -282,19 +381,50 @@ class CircuitSimulator:
 
         translate_window = tk.Toplevel(self.master)
         translate_window.title("Translate Screen")
-        translate_app = TranslateScreen(translate_window, num_nodes, connections)
+        #translate_app = TranslateScreen(translate_window, num_nodes, connections)
+        translate_app = TranslateScreen(translate_window, self)  # Pass 'self' as the second argument
         translate_app.color_dots_based_on_nodes(num_nodes)
 
         # Create a thread to send the matrix without blocking the GUI
-        matrix = translate_app.generate_matrix_for_esp()
-        send_thread = threading.Thread(target=esp_comm.send_matrix, args=(matrix,))
-        send_thread.start()
+        # ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+        # #ser.write(b'0 0 1')
+        # time.sleep(1)
+        
+        # #get/make matrix via connections
+        # matrix = translate_app.generate_matrix_for_esp()
+        
+        # #make matrix
+        # information = ""
+        # for row in matrix:
+        #     for element in row:
+        #         information += str(element) + " "
+        #     information = information.rstrip()
+        #     information += " "
+        # information = information.rstrip()
 
-        # Optional: print a message to the console
-        print("Sending matrix to ESP...")
+        # # Convert the string to Unicode
+        # information_unicode = information.encode('utf-8')
+        # #send matrix to esp
+        # ser.write(information_unicode)
+        
+        # #close port
+        # ser.close()
+        
 
-
-
+#stuff for sensor
+    def get_sensor_data(self):
+        with serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1) as ser:
+            time.sleep(2)  # Wait for the serial connection to initialize
+            ser.write(b"GET_SENSOR_DATA\n")  # Send command to get sensor data
+            ser.flushInput()
+            #time.sleep(7)
+            while(1):
+                sensor_info = ser.readline().decode().strip()
+                print("Received sensor data from ESP:", sensor_info)
+                if sensor_info != "GET_SENSOR_DATA":
+                    break
+            return sensor_info
+        
     
     def enable_edit_mode(self):
         self.is_edit_mode = True
@@ -319,7 +449,10 @@ class CircuitSimulator:
         height = self.canvas.winfo_reqheight()
         for x in range(0, width, self.grid_size):
             for y in range(0, height, self.grid_size):
-                self.canvas.create_oval(x-2, y-2, x+2, y+2, fill='gray')
+                # Use a very light gray color that is almost white to simulate transparency
+                #self.canvas.create_oval(x-1, y-1, x+1, y+1, fill='#F8F8F8', outline='')  # light gray fill
+                self.canvas.create_oval(x-.5, y-.5, x+.5, y+.5, fill='white')
+
     
     def add_component(self, component):
         self.component_objects.append(component)
@@ -392,13 +525,19 @@ class CircuitSimulator:
     
     def place_component_or_start_wire_or_delete(self, event):
         grid_x, grid_y = round(event.x / self.grid_size) * self.grid_size, round(event.y / self.grid_size) * self.grid_size
-        clicked_item = self.canvas.find_closest(event.x, event.y)[0]
+        closest_items = self.canvas.find_closest(event.x, event.y)
+
+        if closest_items:
+            clicked_item = closest_items[0]
+        else:
+            clicked_item = None
 
         if self.is_edit_mode:
-            self.handle_edit(event)
+            if clicked_item:
+                self.handle_edit(event)
             self.is_edit_mode = False
             return
-        elif self.is_delete_mode:
+        elif self.is_delete_mode and clicked_item:
             component_to_delete = next((comp for comp in self.component_objects if clicked_item in comp.id), None)
             if component_to_delete:
                 self.delete_component(component_to_delete)
@@ -413,12 +552,11 @@ class CircuitSimulator:
                 self.update_connections(self.wire_start_x, self.wire_start_y, grid_x, grid_y, wire)
                 self.wire_start_x, self.wire_start_y = None, None
         else:
-            if (grid_x, grid_y) not in self.occupied_positions:
-                if self.selected_component_type:
-                    component = self.selected_component_type(self.canvas, grid_x, grid_y)
-                    self.add_component(component)
-                    self.occupied_positions.add((grid_x, grid_y))
-                    self.reconnect_components_if_applicable(grid_x, grid_y, component)
+            if (grid_x, grid_y) not in self.occupied_positions and self.selected_component_type:
+                component = self.selected_component_type(self.canvas, grid_x, grid_y)
+                self.add_component(component)
+                self.occupied_positions.add((grid_x, grid_y))
+
 
 
 
