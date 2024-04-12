@@ -391,26 +391,26 @@ class CircuitSimulator:
         translate_app.color_dots_based_on_nodes(len(node_to_components))
 
         # Create a thread to send the matrix without blocking the GUI
-        # ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
-        # #ser.write(b'0 0 1')
+        ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+        ser.write(b"MATRIX")
         # time.sleep(1)
         
         # #get/make matrix via connections
-        # matrix = translate_app.generate_matrix_for_esp()
+        matrix = translate_app.generate_matrix_for_esp()
         
         # #make matrix
-        # information = ""
-        # for row in matrix:
-        #     for element in row:
-        #         information += str(element) + " "
-        #     information = information.rstrip()
-        #     information += " "
-        # information = information.rstrip()
+        information = ""
+        for row in matrix:
+            for element in row:
+                information += str(element) + " "
+            information = information.rstrip()
+            information += " "
+        information = information.rstrip()
 
         # # Convert the string to Unicode
-        # information_unicode = information.encode('utf-8')
-        # #send matrix to esp
-        # ser.write(information_unicode)
+        information_unicode = information.encode('utf-8')
+        #send matrix to esp
+        ser.write(information_unicode)
         
         # #close port
         # ser.close()
@@ -418,19 +418,19 @@ class CircuitSimulator:
 
 #stuff for sensor
     def get_sensor_data(self):
-        # with serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1) as ser:
-        #     time.sleep(2)  # Wait for the serial connection to initialize
-        #     ser.write(b"GET_SENSOR_DATA\n")  # Send command to get sensor data
-        #     ser.flushInput()
-        #     #time.sleep(7)
-        #     while(1):
-        #         sensor_info = ser.readline().decode().strip()
-        #         print("Received sensor data from ESP:", sensor_info)
-        #         if sensor_info != "GET_SENSOR_DATA":
-        #             break
-        #     return sensor_info
-        sensor_data = "3.01V 2.00mA"
-        return sensor_data
+        with serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1) as ser:
+            time.sleep(2)  # Wait for the serial connection to initialize
+            ser.write(b"GET_SENSOR_DATA\n")  # Send command to get sensor data
+            ser.flushInput()
+            #time.sleep(7)
+            while(1):
+                sensor_info = ser.readline().decode().strip()
+                print("Received sensor data from ESP:", sensor_info)
+                if sensor_info != "GET_SENSOR_DATA":
+                    break
+            return sensor_info
+        #sensor_data = "3.01V 2.00mA"
+        #return sensor_data
         
     
     def enable_edit_mode(self):
