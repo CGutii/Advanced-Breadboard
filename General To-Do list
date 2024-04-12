@@ -1,8 +1,8 @@
 # To-Do List
 
 ## High Priority
-- [ ] Fix placement errors on Circuit Sim GUI (double click logic)
-- [ ] Fix Edit and Delete button functionality
+- [X] Fix placement errors on Circuit Sim GUI (double click logic)
+- [~] Fix Edit and Delete button functionality    *NOTE: A reset button was added instead*
 - [ ] Add components on the translate screen
 
 ## Medium Priority
