@@ -73,13 +73,7 @@ class CircuitGraph:
             self.components[component].append(node_label)
         if component not in self.nodes[node_label]:
             self.nodes[node_label].append(component)
-    
-    def get_all_connections(self):
-        connections_dict = {}
-        for node_label, components in self.nodes.items():
-            connections = [comp.label for comp in components if isinstance(comp, Component)]
-            connections_dict[node_label] = connections
-        return connections_dict
+
 
     def get_all_connections(self):
         connections_dict = {}
