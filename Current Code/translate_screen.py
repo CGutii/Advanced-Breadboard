@@ -12,9 +12,9 @@ class TranslateScreen:
         self.master = master
         self.num_nodes = num_nodes
         self.connections = connections
-        self.dots_to_color = []
         self.canvas = tk.Canvas(master, width=700, height=440)  # Adjusted width to make space for connections text
         self.canvas.pack()
+        self.dots_to_color= []
         # Reference matrices for colors and values
         self.color_matrix = [['#F5F5DC', '#0000FF', '#006400'],
                              ['#FFA500', '#FF0000', '#90EE90'],
@@ -109,9 +109,9 @@ class TranslateScreen:
                 warnings_text += "Series components:\n"
                 for s_comp in series_components:
                     warnings_text += f"- {s_comp}\n"
-            print("Parallel Components:", parallel_components)
-            print("Series Components:", series_components)
-            print("Displayed on canvas:", warnings_text.strip())
+            # print("Parallel Components:", parallel_components)
+            # print("Series Components:", series_components)
+            # print("Displayed on canvas:", warnings_text.strip())
 
     def find_series_parallel_components(self):
         parallel_components = []
