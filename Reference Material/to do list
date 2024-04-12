@@ -1,1 +1,0 @@
-Check for when screen is closed. If screen is closed, call function to esp32 to reset all LEDs to off.

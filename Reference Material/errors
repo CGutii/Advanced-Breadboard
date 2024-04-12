@@ -1,0 +1,12 @@
+Exception in Tkinter callback
+Traceback (most recent call last):
+  File "/usr/lib/python3.11/tkinter/__init__.py", line 1948, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "/home/guti/Advanced Breadboard/Acknowledgments/circuit_simulator.py", line 399, in open_translate_screen
+    matrix = translate_app.generate_matrix_for_esp()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/guti/Advanced Breadboard/Acknowledgments/translate_screen.py", line 144, in generate_matrix_for_esp
+    for dot_index in self.dots_to_color:
+                     ^^^^^^^^^^^^^^^^^^
+AttributeError: 'TranslateScreen' object has no attribute 'dots_to_color'
