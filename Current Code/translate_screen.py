@@ -12,6 +12,7 @@ class TranslateScreen:
         self.master = master
         self.num_nodes = num_nodes
         self.connections = connections
+        self.dots_to_color = []
         self.canvas = tk.Canvas(master, width=700, height=440)  # Adjusted width to make space for connections text
         self.canvas.pack()
         # Reference matrices for colors and values
