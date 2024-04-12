@@ -377,9 +377,9 @@ class CircuitSimulator:
             print("Circuit components have been reset.")
 
 
-
-    self.print_connections()
-
+def open_translate_screen(self):
+        self.circuit_graph.merge_nodes_by_junction()
+        self.print_connections()
         node_to_components = self.circuit_graph.get_all_connections()
 
         translate_window = tk.Toplevel(self.master)
