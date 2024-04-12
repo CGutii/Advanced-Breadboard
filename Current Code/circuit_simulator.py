@@ -271,6 +271,7 @@ class CircuitSimulator:
         self.add_tool_button("Delete", self.toggle_delete_mode, tools_frame)
         self.add_tool_button("Connections", self.print_connections, tools_frame)
         self.add_tool_button("Edit", self.enable_edit_mode, tools_frame)
+        self.add_tool_button("Reset LEDs", self.reset_pins,tools_frame) #led reset
         self.add_tool_button("Toggle Values", self.toggle_values, tools_frame)
         self.add_tool_button("Reset", self.reset_circuit, tools_frame)
 
@@ -340,7 +341,12 @@ class CircuitSimulator:
     def fixed_connections(self):
         self.circuit_graph.merge_nodes_by_junction()
         self.print_connections()
-
+    
+    def reset_pins(self):
+        with serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1) as ser:
+            ser.write(b"RESET_PINS\n")
+            #print("Resetting Pins")
+        #ser.close()
     # def get_all_connections(self):
     #     # This is a placeholder implementation
     #     # You need to adjust it to match your data structure
@@ -376,14 +382,13 @@ class CircuitSimulator:
         self.circuit_graph.merge_nodes_by_junction()
         self.print_connections()
 
-        num_nodes = len(self.circuit_graph.nodes)
-        connections = self.circuit_graph.get_all_connections()
+        self.circuit_graph.merge_nodes_by_junction()
+        node_to_components = self.circuit_graph.get_all_connections()
 
         translate_window = tk.Toplevel(self.master)
         translate_window.title("Translate Screen")
-        #translate_app = TranslateScreen(translate_window, num_nodes, connections)
-        translate_app = TranslateScreen(translate_window, self)  # Pass 'self' as the second argument
-        translate_app.color_dots_based_on_nodes(num_nodes)
+        translate_app = TranslateScreen(translate_window, self, num_nodes=len(node_to_components), connections=node_to_components)
+        translate_app.color_dots_based_on_nodes(len(node_to_components))
 
         # Create a thread to send the matrix without blocking the GUI
         # ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
@@ -413,17 +418,19 @@ class CircuitSimulator:
 
 #stuff for sensor
     def get_sensor_data(self):
-        with serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1) as ser:
-            time.sleep(2)  # Wait for the serial connection to initialize
-            ser.write(b"GET_SENSOR_DATA\n")  # Send command to get sensor data
-            ser.flushInput()
-            #time.sleep(7)
-            while(1):
-                sensor_info = ser.readline().decode().strip()
-                print("Received sensor data from ESP:", sensor_info)
-                if sensor_info != "GET_SENSOR_DATA":
-                    break
-            return sensor_info
+        # with serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1) as ser:
+        #     time.sleep(2)  # Wait for the serial connection to initialize
+        #     ser.write(b"GET_SENSOR_DATA\n")  # Send command to get sensor data
+        #     ser.flushInput()
+        #     #time.sleep(7)
+        #     while(1):
+        #         sensor_info = ser.readline().decode().strip()
+        #         print("Received sensor data from ESP:", sensor_info)
+        #         if sensor_info != "GET_SENSOR_DATA":
+        #             break
+        #     return sensor_info
+        sensor_data = "3.01V 2.00mA"
+        return sensor_data
         
     
     def enable_edit_mode(self):
