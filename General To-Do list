@@ -6,7 +6,7 @@
 - [ ] Add components on the translate screen
 
 ## Medium Priority
-- [ ] Turn on off/Reset LEDs after initial translation
+- [X] Give option to turn off/Reset LEDs after initial translation
 - [ ] Fix and adjust Help Screen
 - [X] Adjust connections dispaly on Translate Screen
 
