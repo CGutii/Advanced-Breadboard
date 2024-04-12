@@ -11,8 +11,8 @@
 - [X] Adjust connections dispaly on Translate Screen
 
 ## Low Priority
-- [ ] Adjust Colors on Translate Screen to match LEDs
+- [X] Adjust Colors on Translate Screen to match LEDs
 - [ ] Use Custom Tkinter for making aesthetically better
-- [ ] Add clear screen / reset button on main GUI
+- [X] Add clear screen / reset button on main GUI
 
 ## Completed
