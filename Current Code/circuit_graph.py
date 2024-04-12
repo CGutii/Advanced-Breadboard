@@ -1,4 +1,4 @@
-
+                                                                                                                                                                        
 class CircuitGraph:
     def __init__(self):
         self.components = {}
@@ -9,6 +9,13 @@ class CircuitGraph:
     def add_component(self, component):
         if component not in self.components:
             self.components[component] = []
+    
+    def reset_graph(self):
+        self.components.clear()
+        self.nodes.clear()
+        self.next_node_label = 'A'
+        print("All connections and components have been cleared from the graph.")
+        
 
     def create_node(self, components):
         node_label = self.next_node_label
@@ -68,26 +75,20 @@ class CircuitGraph:
             self.nodes[node_label].append(component)
     
     def get_all_connections(self):
-        connections = []
+        connections_dict = {}
         for node_label, components in self.nodes.items():
-            # Filter components to exclude wires for clarity
-            filtered_components = [comp for comp in components if not hasattr(comp, 'end_x') and hasattr(comp, 'label')]
-            # Create connections between all components within the same node
-            for i, comp in enumerate(filtered_components):
-                for connected_comp in filtered_components[i+1:]:
-                    # Ensure we have two distinct components to connect
-                    if comp is not connected_comp:
-                        connection = f"{comp.label} to {connected_comp.label}"
-                        connections.append(connection)
-        return connections
+            connections = [comp.label for comp in components if isinstance(comp, Component)]
+            connections_dict[node_label] = connections
+        return connections_dict
 
-    def delete_component(self, component):
-        for node_label in list(self.components.get(component, [])):
-            self.nodes[node_label].remove(component)
-            if len(self.nodes[node_label]) < 2:
-                del self.nodes[node_label]
-        if component in self.components:
-            del self.components[component]
+    def get_all_connections(self):
+        connections_dict = {}
+        for node_label, components in self.nodes.items():
+            # Filter out the wires and only include components with a label attribute
+            filtered_components = [comp for comp in components if hasattr(comp, 'label') and not hasattr(comp, 'end_x')]
+            connections = [comp.label for comp in filtered_components]
+            connections_dict[node_label] = connections
+        return connections_dict
 
     def delete_wire(self, wire):
         for node_label, components in list(self.nodes.items()):
