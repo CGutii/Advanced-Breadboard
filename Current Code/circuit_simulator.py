@@ -392,13 +392,13 @@ class CircuitSimulator:
         translate_app.color_dots_based_on_nodes(len(node_to_components))
 
         # Create a thread to send the matrix without blocking the GUI
-        # ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
-        # #ser.write(b'0 0 1')
-        # time.sleep(1)
+        ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+        ser.write(b"MATRIX")
+        time.sleep(1)
         
         # #get/make matrix via connections
         matrix = translate_app.generate_matrix_for_esp()
-        print(matrix)
+        #print(matrix)
         
         #make matrix
         information = ""
@@ -410,10 +410,10 @@ class CircuitSimulator:
         information = information.rstrip()
 
         # # Convert the string to Unicode
-        print(information)
-        # information_unicode = information.encode('utf-8')
-        # #send matrix to esp
-        # ser.write(information_unicode)
+        #print(information)
+        information_unicode = information.encode('utf-8')
+        #send matrix to esp
+        ser.write(information_unicode)
         
         # #close port
         # ser.close()
