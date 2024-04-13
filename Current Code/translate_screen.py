@@ -58,43 +58,55 @@ class TranslateScreen:
 
     # Let's update the color_dots_based_on_nodes function
 
+   # Let's adjust the function color_dots_based_on_nodes to randomly pick nodes to turn on in the 3x3 grid
+
     def color_dots_based_on_nodes(self, num_nodes):
-        # Reset the dot colors to black (off state)
+        # Ensure num_nodes is not greater than the total number of main dots
+        num_nodes = min(num_nodes, 9)
+
+        # Gather unique node labels from the connections
+        available_labels = sorted(set(self.connections))
+
+        # Randomly assign labels to the turned-on nodes and update value_matrix
+        self.value_matrix = [[0 for _ in range(3)] for _ in range(3)]
+        available_nodes = [(i, j) for i in range(3) for j in range(3)]
+        random.shuffle(available_nodes)
+        selected_nodes = available_nodes[:num_nodes]
+
+        for idx, (i, j) in enumerate(selected_nodes):
+            label = available_labels[idx] if idx < len(available_labels) else None
+            if label:
+                x = 60 + i * self.grid_size
+                y = 60 + j * self.grid_size
+                color = self.color_matrix[i][j]  # Use the predefined color matrix for the color
+                # Update the main dot color and label
+                self.canvas.itemconfig(f"dot_{i}_{j}", fill=color, outline=color)
+                self.canvas.create_text(x, y, text=label, fill="white", tags=("dot_label", f"dot_label_{i}_{j}"))
+                # Update the dots_to_color with the dot's index in the grid
+                self.dots_to_color.append(i * 3 + j)
+                # Update the value_matrix with the label for the lit-up dot
+                self.value_matrix[i][j] = label
+
+        # Reset all dots first
         for i in range(3):
             for j in range(3):
-                self.canvas.itemconfig(f'dot_{i}_{j}', fill='black', outline='black')
-                # Remove any previous labels from the dots
+                dot_tag = f"dot_{i}_{j}"
+                self.canvas.itemconfig(dot_tag, fill='black', outline='black')
                 self.canvas.delete(f"dot_label_{i}_{j}")
 
-        # If there are no nodes, nothing else needs to be done
-        if num_nodes == 0:
-            return
+        # Color the dots and place labels
+        for idx, (row, col) in enumerate(selected_nodes):
+            # Coordinates for the center of the dot
+            x = 60 + col * self.grid_size
+            y = 60 + row * self.grid_size
 
-        # Get a list of node labels (A, B, C, etc.)
-        node_labels = sorted(self.connections.keys())
+            # Set the fill color based on the color_matrix
+            color = self.color_matrix[col][row]
+            self.canvas.itemconfig(f"dot_{col}_{row}", fill=color, outline=color)
 
-        # Determine which dots should be colored based on the node_labels
-        for idx, node_label in enumerate(node_labels):
-            if idx < 9:  # We have only 9 spots on the grid
-                row, col = divmod(idx, 3)
-                x = 60 + row * self.grid_size
-                y = 60 + col * self.grid_size
-
-                # Now use the color_matrix to set the color based on the row, column position
-                color = self.color_matrix[row][col]
-
-                # Update the color of the dot
-                self.canvas.itemconfig(f'dot_{row}_{col}', fill=color, outline=color)
-
-                # Add the node label on the colored dot
-                self.canvas.create_text(x, y, text=node_label, fill='white', font=('Arial', 14, 'bold'), tags=(f"dot_label_{row}_{col}"))
-                
-                # Update the dots_to_color list with the dot index based on the 3x3 matrix
-                self.dots_to_color.append(row * 3 + col)
-
-    # This should be in the TranslateScreen class, replacing the old color_dots_based_on_nodes function.
-    # Now, every time a dot is turned on (colored), it will also update the dots_to_color list with the correct index.
-    # This list will then be used by the generate_matrix_for_esp function to create the correct matrix.
+            # Add the node label text
+            label = available_labels[idx]
+            self.canvas.create_text(x, y, text=label, fill="white", font=('Arial', 14, 'bold'), tags=f"dot_label_{col}_{row}")
 
 
     
