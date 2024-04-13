@@ -113,7 +113,7 @@ class TranslateScreen:
     def generate_matrix_for_esp(self):
         matrix = [["0" for _ in range(3)] for _ in range(3)]
         for dot_index in self.dots_to_color:
-            i, j = divmod(dot_index, 3)
+            j, i = divmod(dot_index, 3)
             matrix[j][i] = "1"
         return matrix
 
