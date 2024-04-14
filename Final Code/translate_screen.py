@@ -131,7 +131,7 @@ class TranslateScreen:
             self.canvas.create_text(450, 20, text=connections_text.strip(), anchor="nw", fill="black", tags="connections")
 
             # Optionally update parallel/series component display, if relevant
-            self.display_component_warnings()
+            #self.display_component_warnings()
         
     def display_component_warnings(self):
         parallel_components, series_components = self.find_series_parallel_components()
