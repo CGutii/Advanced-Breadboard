@@ -27,6 +27,7 @@ class TranslateScreen:
         self.sensor_data_btn = tk.Button(master, text="Get Sensor Data", command=self.update_sensor_data_and_warnings)
         self.sensor_data_btn.pack()
         self.sensor_data_label = tk.Label(master, text="Sensor Data: Not fetched yet")
+        self.sensor_data_label = tk.Label(master, text="*NOTE* : We cannot support circuits with multiple voltage sources or circuits with between -2 to 2 mA")
         self.sensor_data_label.pack()
         self.warning_label = tk.Text(master, height=10, width=15)
         self.warning_label.pack()
@@ -131,7 +132,7 @@ class TranslateScreen:
             self.canvas.create_text(450, 20, text=connections_text.strip(), anchor="nw", fill="black", tags="connections")
 
             # Optionally update parallel/series component display, if relevant
-            #self.display_component_warnings()
+            self.display_component_warnings()
         
     def display_component_warnings(self):
         parallel_components, series_components = self.find_series_parallel_components()
@@ -188,7 +189,7 @@ class TranslateScreen:
         voltage, current = self.parse_sensor_data(sensor_data_str)
     
         # Update the sensor data label and warnings
-        self.sensor_data_label.config(text=f"Sensor Data: Voltage={voltage}, Current={current}")
+        self.sensor_data_label.config(text=f"{voltage} V, Current={current} mA")
         short_circuit, open_circuit = self.getIntegerSensorData(voltage, current)
         self.update_warnings(short_circuit, open_circuit)
 
