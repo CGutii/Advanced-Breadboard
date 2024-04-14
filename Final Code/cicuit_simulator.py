@@ -12,7 +12,7 @@ from circuit_graph import CircuitGraph
 
 SERIAL_PORT = '/dev/ttyUSB0'
 BAUD_RATE = 115200
-
+ 
 
 # Updated to track the count of each component type, now including 'Junction'
 component_count = {"R": 0, "C": 0, "V": 0, "L": 0, "GND": 0, "Junction": 0}
@@ -397,9 +397,8 @@ class CircuitSimulator:
         matrix = translate_app.generate_matrix_for_esp()
         #print(matrix)
 
-        """ uncomment this section for in-person testing
 
-        # Create a thread to send the matrix without blocking the GUI
+        #Create a thread to send the matrix without blocking the GUI
         ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
         ser.write(b"MATRIX")
         time.sleep(1)
@@ -413,12 +412,11 @@ class CircuitSimulator:
             information += " "
         information = information.rstrip()
 
-        # # Convert the string to Unicode
+        #Convert the string to Unicode
         #print(information)
         information_unicode = information.encode('utf-8')
         #send matrix to esp
         ser.write(information_unicode)
-         end of section  """ 
         
 
 
@@ -428,19 +426,19 @@ class CircuitSimulator:
 
 #stuff for sensor
     def get_sensor_data(self):
-        # with serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1) as ser:
-        #     time.sleep(2)  # Wait for the serial connection to initialize
-        #     ser.write(b"GET_SENSOR_DATA\n")  # Send command to get sensor data
-        #     ser.flushInput()
-        #     #time.sleep(7)
-        #     while(1):
-        #         sensor_info = ser.readline().decode().strip()
-        #         print("Received sensor data from ESP:", sensor_info)
-        #         if sensor_info != "GET_SENSOR_DATA":
-        #             break
-        #     return sensor_info
-        sensor_data = "3.01V 2.00mA"
-        return sensor_data
+        with serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1) as ser:
+            time.sleep(2)  # Wait for the serial connection to initialize
+            ser.write(b"GET_SENSOR_DATA\n")  # Send command to get sensor data
+            ser.flushInput()
+            #time.sleep(7)
+            while(1):
+                sensor_info = ser.readline().decode().strip()
+                print("Received sensor data from ESP:", sensor_info)
+                if sensor_info != "GET_SENSOR_DATA":
+                    break
+            return sensor_info
+        # sensor_data = "3.01V -1.00mA"
+        # return sensor_data
         
     
     def enable_edit_mode(self):
