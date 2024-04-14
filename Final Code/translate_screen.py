@@ -13,12 +13,12 @@ class TranslateScreen:
         self.num_nodes = num_nodes
         self.connections = connections
         self.dots_to_color = []
-        self.canvas = tk.Canvas(master, width=700, height=440)  # Adjusted width to make space for connections text
+        self.canvas = tk.Canvas(master, width=700, height=600)  # Adjusted width to make space for connections text
         self.canvas.pack()
         # Reference matrices for colors and values
-        self.color_matrix = [['#F5F5DC', '#0000FF', '#006400'],
-                             ['#FFA500', '#FF0000', '#90EE90'],
-                             ['#FFFF00', '#FFFFFF', '#800080']]
+        self.color_matrix = [['#F5F5DC', '#FFA500', '#FFFF00'],
+                            ['#0000FF', '#FF0000', '#FFFFFF'],
+                            ['#006400', '#90EE90', '#800080']]
         self.value_matrix = [[0, 0, 0],
                              [0, 0, 0],
                              [0, 0, 0]]
@@ -27,7 +27,7 @@ class TranslateScreen:
         self.sensor_data_btn = tk.Button(master, text="Get Sensor Data", command=self.update_sensor_data_and_warnings)
         self.sensor_data_btn.pack()
         self.sensor_data_label = tk.Label(master, text="Sensor Data: Not fetched yet")
-        self.sensor_data_label = tk.Label(master, text="*NOTE* : We cannot support circuits with multiple voltage sources or circuits with between -2 to 2 mA")
+        self.sensor_data_label = tk.Label(master, text="*NOTE*: \n-AB cannot support circuits with multiple voltage sources \n -circuits between -2 to 2 mA")
         self.sensor_data_label.pack()
         self.warning_label = tk.Text(master, height=10, width=15)
         self.warning_label.pack()
@@ -114,7 +114,7 @@ class TranslateScreen:
     def generate_matrix_for_esp(self):
         matrix = [["0" for _ in range(3)] for _ in range(3)]
         for dot_index in self.dots_to_color:
-            i, j = divmod(dot_index, 3)
+            j, i = divmod(dot_index, 3)
             matrix[j][i] = "1"
         return matrix
 
@@ -132,7 +132,7 @@ class TranslateScreen:
             self.canvas.create_text(450, 20, text=connections_text.strip(), anchor="nw", fill="black", tags="connections")
 
             # Optionally update parallel/series component display, if relevant
-            self.display_component_warnings()
+            #self.display_component_warnings()
         
     def display_component_warnings(self):
         parallel_components, series_components = self.find_series_parallel_components()
@@ -210,7 +210,7 @@ class TranslateScreen:
         if voltage == 0:
             short_circuit = True
             
-        if current < 2:
+        if current in range(-2,2):
             open_circuit = True
             
         return short_circuit, open_circuit
